@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="ini_google.ad_hoc_building_sensor_devices.MainActivity">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/connectStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@android:color/holo_green_light"
+                android:textColor="@android:color/white"
+                android:textSize="32sp"
+                android:layout_marginBottom="10dp"
+                android:text="Is connected?" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="364dp"
+                android:layout_height="wrap_content"
+                android:text="Device ID"
+                android:id="@+id/textView"
+                android:background="#ffffff"
+                android:textSize="32dp"
+                android:textColor="#252222"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/activeList"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:background="@android:color/holo_blue_light"
+                android:textColor="@android:color/white"
+                android:textSize="32sp"
+                android:layout_marginBottom="10dp"
+                android:text=""/>
+        </TableRow>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentTop="false">
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Fetch Device ID"
+                android:id="@+id/fetchButton"
+                android:layout_marginBottom="48dp"
+                android:textSize="16dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"/>
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Submit"
+                android:id="@+id/submitButton"
+                android:layout_alignTop="@+id/fetchButton"
+                android:textSize="16dp"
+                android:layout_alignEnd="@+id/textView"
+                android:layout_alignBottom="@+id/fetchButton"/>
+        </LinearLayout>
+
+    </TableLayout>
+
+</RelativeLayout>
