@@ -80,9 +80,9 @@
 	<div id="message">
 		<h1>Welcome to Firebase Hosting</h1>
 		<h1> {{2+3}}</h1>
-		<h4>Connected Device</h4>
+		<h4>Connected Devices</h4>
 		<ul>
-			<li ng-repeat="d in mc.devices"></li>
+			<li ng-repeat="d in mc.devices track by $index">{{d}}</li>
 		</ul>
 	</div>
 </body>
