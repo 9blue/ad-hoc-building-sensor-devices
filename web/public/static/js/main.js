@@ -16,7 +16,7 @@
                 var tmp = snapshot.val();
                 var holder = [];
                 for (var d in tmp) {
-                    holder.push(tmp[d]);
+                    holder.push(d);
                 }
                 vm.devices = holder;
                 console.log(vm.devices);

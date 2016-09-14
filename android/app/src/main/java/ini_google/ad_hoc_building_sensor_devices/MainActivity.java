@@ -26,13 +26,11 @@ public class MainActivity extends AppCompatActivity {
     private Button fetchButton, submitButton;
     private TextView textView, connectedList;
     private static TextView connectionStatus;
-    private DatabaseReference deviceList;
-    private ValueEventListener deviceListListener;
+
     // Firebase instance variables
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
-
-
-
+    private DatabaseReference deviceList = database.getReference().child("connected_devices");
+    private ValueEventListener deviceListListener;
 
 
 
@@ -49,7 +47,15 @@ public class MainActivity extends AppCompatActivity {
         connectionStatus = (TextView) findViewById(R.id.connectStatus);
         fetchButton = (Button) findViewById(R.id.fetchButton);
         submitButton = (Button) findViewById(R.id.submitButton);
-        deviceList = database.getReference().child("connected_devices");
+
+        deviceList.child(android_id).onDisconnect().removeValue(new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError error, DatabaseReference firebase) {
+                if (error != null) {
+                    System.out.println("could not establish onDisconnect event:" + error.getMessage());
+                }
+            }
+        });
 
         fetchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,10 +69,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.d(TAG, "Andorid_id " + android_id);
                 textView.setText("Device ID Submitting");
-//                new SendPostRequest().execute();
 
-                deviceList.push().setValue(android_id);
-
+                deviceList.child(android_id).setValue(android_id);
                 textView.setText("Device ID Submitted");
                 submitButton.setEnabled(false);
             }
@@ -88,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 if (obj != null) {
                     HashMap<String, String> data = (HashMap) obj;
                     StringBuilder sbStr = new StringBuilder();
-                    for (String id : data.values()){
+                    for (String id : data.keySet()){
                         sbStr.append(id);
                         sbStr.append("\n");
                     }
