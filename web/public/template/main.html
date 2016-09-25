@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="dropdown pull-right">
+        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Orignaizations
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li ng-repeat="c in mc.organizations track by $index" ng-click="mc.select_org(c)"><a href="#">{{c.name}}</a></li>
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <a class="btn btn-primary" ui-sref="create_proejct">Add another app</a>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#add_app">
+            Add another app
+        </button>
+    </div>
+    <div class="col-md-8">
+        <h4>{{mc.selected_org.name}} Applications</h4>
+        <ul ng-repeat="(k, v) in mc.selected_org.applications track by $index">
+            <li><a ui-sref="app({ id: k })">{{v}}</a></li>
+        </ul>
+    </div>
+</div>
+<div ng-include="mc.modal_template"></div>

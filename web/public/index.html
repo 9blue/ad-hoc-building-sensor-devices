@@ -1,90 +1,70 @@
 <!DOCTYPE html>
-<html ng-app="datacenter">
+<html ng-app="adhocAPP">
+
 <head>
-	<meta charset="utf-8">
-	<title>Welcome to Firebase Hosting</title>
-	<style media="screen">
-		body {
-			font-family: Roboto, Arial, sans-serif;
-			background: #ECEFF1;
-			color: rgba(0, 0, 0, 0.87);
-		}
+    <meta charset="utf-8">
+    <title>Ad-hoc sensor devices development </title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style media="screen">
+    body {
+        background: #ECEFF1;
+        color: rgba(0, 0, 0, 0.87);
+    }
 
-		a {
-			color: rgb(3, 155, 229);
-		}
+    .container {
+        margin: 40px auto;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+        border-radius: 2px;
+        background: white;
+        padding: 16px 24px;
+    }
+    </style>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="//npmcdn.com/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.3.2/firebase.js"></script>
+    <script type="text/javascript">
+    var adhocAPP = angular.module('adhocAPP', ['ui.router']);
+    </script>
+    <script type="text/javascript" src="/static/js/main.js"></script>
+    <script type="text/javascript" src="/static/js/config.js"></script>
+    <script type="text/javascript" src="/static/js/app_view.js"></script>
+    <script type="text/javascript" src="/static/js/create_project.js"></script>
+    <script type="text/javascript" src="/static/js/router.js"></script>
+    <script type="text/javascript">
+    // Set the configuration for your app
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyAGCZbEkvC0hTGh5M-YABT9_KCTQ5jK5bo",
+        authDomain: "ad-hoc-building-sensor-devices.firebaseapp.com",
+        databaseURL: "https://ad-hoc-building-sensor-devices.firebaseio.com",
+        storageBucket: "ad-hoc-building-sensor-devices.appspot.com",
+    };
+    firebase.initializeApp(config);
 
-		#message {
-			max-width: 400px;
-			margin: 40px auto;
-			box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
-			border-radius: 2px;
-			background: white;
-			padding: 16px 24px;
-		}
-
-		#message h1 {
-			font-size: 22px;
-			font-weight: 500;
-			text-align: center;
-			margin: 0 0 16px;
-		}
-
-		#message p {
-			font-weight: 300;
-			line-height: 150%;
-		}
-
-		#message ul {
-			list-style: none;
-			margin: 16px 0 0;
-			padding: 0;
-			text-align: center;
-		}
-
-		#message li a {
-			display: inline-block;
-			padding: 8px;
-			text-transform: uppercase;
-			text-decoration: none;
-			font-weight: 500;
-			background: rgb(3, 155, 229);
-			color: white;
-			border: 1px solid rgb(3, 155, 229);
-			border-radius: 3px;
-			font-size: 14px;
-			box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .26);
-		}
-	</style>
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
-	<script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.3.2/firebase.js"></script>
-	<!-- <script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.3.0/firebase-database.js"></script> -->
-	<script type="text/javascript" src="/static/js/main.js"></script>
-	<script type="text/javascript">
-		// Set the configuration for your app
-		// Initialize Firebase
-		var config = {
-			apiKey: "AIzaSyAGCZbEkvC0hTGh5M-YABT9_KCTQ5jK5bo",
-			authDomain: "ad-hoc-building-sensor-devices.firebaseapp.com",
-			databaseURL: "https://ad-hoc-building-sensor-devices.firebaseio.com",
-			storageBucket: "ad-hoc-building-sensor-devices.appspot.com",
-		};
-		firebase.initializeApp(config);
-
-		// Get a reference to the database service
-		// var database = firebase.database();
-		// var dbRef = firebase.database().ref();
-	</script>
+    // Get a reference to the database service
+    // var database = firebase.database();
+    // var dbRef = firebase.database().ref();
+    </script>
 </head>
-<body ng-controller="MainController as mc">
-	<div id="message">
-		<h1>Welcome to Firebase Hosting</h1>
-		<h1> {{2+3}}</h1>
-		<h4>Connected Devices</h4>
-		<ul>
-			<li ng-repeat="d in mc.devices track by $index">{{d}}</li>
-		</ul>
-	</div>
+<!-- <body ng-controller="MainController as mc"> -->
+
+<body>
+    <!-- NAVIGATION -->
+    <nav class="navbar navbar-inverse" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" ui-sref="#">Ad-hoc Sensor Devices Deployment</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a ui-sref="home" ui-sref-active="active">Home</a></li>
+            <li><a ui-sref="config" ui-sref-active="active">Configurations</a></li>
+        </ul>
+    </nav>
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <div ui-view></div>
+    </div>
 </body>
 
 </html>
