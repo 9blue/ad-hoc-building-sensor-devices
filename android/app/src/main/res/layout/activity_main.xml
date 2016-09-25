@@ -11,7 +11,8 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/tableLayout">
 
         <TableRow
             android:layout_width="match_parent"
@@ -60,35 +61,52 @@
                 android:text=""/>
         </TableRow>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="false"
-            android:layout_alignParentTop="false">
-            <Button
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Fetch Device ID"
-                android:id="@+id/fetchButton"
-                android:layout_marginBottom="48dp"
-                android:textSize="16dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentStart="true"/>
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Submit"
-                android:id="@+id/submitButton"
-                android:layout_alignTop="@+id/fetchButton"
-                android:textSize="16dp"
-                android:layout_alignEnd="@+id/textView"
-                android:layout_alignBottom="@+id/fetchButton"/>
-        </LinearLayout>
-
     </TableLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tableLayout"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout">
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Fetch Device ID"
+            android:id="@+id/fetchButton"
+            android:layout_marginBottom="48dp"
+            android:textSize="16dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+            android:id="@+id/submitButton"
+            android:layout_alignTop="@+id/fetchButton"
+            android:textSize="16dp"
+            android:layout_alignEnd="@+id/textView"
+            android:layout_alignBottom="@+id/fetchButton"/>
+    </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SCAN"
+        android:id="@+id/scanButton"
+        android:layout_column="0"
+        android:layout_alignBottom="@+id/linearLayout"
+        android:layout_alignParentStart="true"
+        android:textSize="16dp"/>
 
 </RelativeLayout>
