@@ -1,10 +1,16 @@
 package ini_google.ad_hoc_building_sensor_devices;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.support.v7.app.AppCompatActivity;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -14,28 +20,35 @@ import android.widget.Toast;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import org.json.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity implements SensorEventListener {
     private static final String TAG = "MainActivity";
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
 
     private static String android_id;
     private Button fetchButton, submitButton, scanButton;
     private TextView textView, connectedList;
     private static TextView connectionStatus;
-    private static String targetURL;
+    private static String config;
+    private int triggerPoint=0;
 
     // Firebase instance variables
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference deviceList = database.getReference().child("connected_devices");
+    private DatabaseReference appDataStore;
     private ValueEventListener deviceListListener;
 
 
@@ -53,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
         fetchButton = (Button) findViewById(R.id.fetchButton);
         submitButton = (Button) findViewById(R.id.submitButton);
         scanButton = (Button) findViewById(R.id.scanButton);
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensor = null;
 
         deviceList.child(android_id).onDisconnect().removeValue(new DatabaseReference.CompletionListener() {
             @Override
@@ -63,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        targetURL = null;
+        config = "";
 
         fetchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,10 +168,34 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Main Activity Scan", "Scanned ====================================");
                 Toast.makeText(this, "Scanned " + result.getContents(), Toast.LENGTH_LONG).show();
                 // start google search activity immediately
-                System.out.println("result: " + result.getContents());
+                //System.out.println("result: " + result.getContents());
 
-                targetURL = extractUrls(result.getContents());
-                System.out.println("URL: " + targetURL);
+                config = result.getContents();
+                textView = (TextView) findViewById(R.id.textView);
+                textView.setText(config);
+                JSONObject configReader = null;
+                try {
+                    configReader = new JSONObject(config);
+                    appDataStore = database.getReferenceFromUrl(configReader.get("firebase_url").toString()).child((String) configReader.get("stream"));
+                    appDataStore.child(android_id).child(Long.toString(new Date().getTime())).setValue("Connected");
+                    mSensor = mSensorManager.getDefaultSensor(Integer.parseInt(configReader.get("sensor_type").toString()));
+                    triggerPoint = Integer.parseInt(configReader.get("trigger").toString());
+                    if(mSensor==null){
+                        textView.setText("Sensor not available in phone");
+                    }
+                    else{
+                        mSensorManager.registerListener(this,mSensor,Integer.parseInt(configReader.get("interval").toString())*100000);
+                    }
+                }
+                catch (final JSONException e) {
+                    Log.e(TAG, "Json parsing error: " + e.getMessage());}
+                catch(Exception e){
+                    Log.e(TAG,e.getMessage());
+                }
+
+
+
+                //System.out.println("URL: " + targetURL);
                 
                 //searchOnInternet(result.getContents());
             }
@@ -186,4 +225,21 @@ public class MainActivity extends AppCompatActivity {
         return "";
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        float lux = event.values[0];
+        TextView textView = (TextView)findViewById(R.id.textView);
+        textView.setTextSize(40);
+        textView.setText(Float.toString(lux));
+        if(lux>triggerPoint)
+        {
+            appDataStore.child(android_id).child(Long.toString(new Date().getTime())).setValue(Float.toString(lux));
+        }
+//
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
 }
