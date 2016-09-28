@@ -138,32 +138,24 @@ public class MainActivity extends Activity implements SensorEventListener {
 //                catch(Exception e){
 //                    Log.e(TAG,e.getMessage());
 //                }
-                ValueEventListener deviceConfigListener = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        // Get Post object and use the values to update the UI
-
-                        /*
+                deviceConfig.addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        /*
                             TODO: Gobi, dataSnapshot.getValue() returns the config file
                             see what you want to do with it. I comment out your json part.
                             since now the information in json, is in dataSnapshot.
-                         */
-                        System.out.println(dataSnapshot.getValue());
-                    }
+                            */
+                                System.out.println(dataSnapshot.getValue());
+                            }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        // Getting Post failed, log a message
-                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-
-                    }
-                };
-                deviceConfig.addValueEventListener(deviceConfigListener);
-                // [END post_value_event_listener]
-
-                // Keep copy of post listener so we can remove it when app stops
-                deviceListListener = deviceConfigListener;
-
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.w(TAG, "getUser:onCancelled", databaseError.toException());
+                                // ...
+                            }
+                        });
             }
         } else {
             //empty
