@@ -250,6 +250,5 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
     private void turnOffFlashLight()
     {
-        
     }
 }
