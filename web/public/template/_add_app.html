@@ -6,18 +6,18 @@
                 <h4 class="modal-title" id="myModalLabel">Add another app</h4>
             </div>
             <div class="modal-body">
-                <form id="new_app" ng-submit="mc.add_app()">
+                <form id="new_app" ng-submit="mc.addApp()">
                     <div class="form-group">
                         <label>Name</label>
-                        <input type="text" class="form-control" ng-model="mc.app_name" placeholder="Application Name" required>
+                        <input type="text" class="form-control" ng-model="mc.appName" placeholder="Application Name" required>
                     </div>
                     <div class="form-group">
                         <label>Number of Devices</label>
-                        <input type="number" min="1" class="form-control" ng-model="mc.devices_num" placeholder="Number of Devices" required>
+                        <input type="number" min="1" class="form-control" ng-model="mc.devNum" placeholder="Number of Devices" required>
                     </div>
                     <div class="form-group">
                         <label>Description</label>
-                        <textarea type="email" class="form-control" ng-model="mc.app_desc" placeholder="Application Description">
+                        <textarea type="email" class="form-control" ng-model="mc.appDesc" placeholder="Application Description">
                         </textarea>
                     </div>
                 </form>

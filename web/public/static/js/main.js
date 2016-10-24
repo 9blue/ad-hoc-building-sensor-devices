@@ -5,50 +5,58 @@
 
     function mainController($timeout) {
         var vm = this;
-        vm.modal_template = "template/_add_app.html";
+        vm.modalTemplate = "template/_add_app.html";
         var dbRef = firebase.database().ref();
         var organizations = dbRef.child('organizations');
         var apps = dbRef.child('applications');
         vm.organizations = [];
 
-        vm.selected_org = null;
+        vm.selectedOrg = null;
         // vm.apps = [];
-        organizations.on('child_added', function(snapshot) {
+        organizations.once('value').then(function(snapshot) {
             $timeout(function() {
-                if (!vm.selected_org) {
-                    vm.selected_org = snapshot.val();
+                if (!vm.selectedOrg) {
+                    var orgs = snapshot.val();
+                    for (var k in orgs) {
+                        vm.organizations.push(orgs[k]);
+                    }
+                    vm.selectedOrg = vm.organizations[0];
                 }
-                var tmp = snapshot.key;
-                vm.organizations.push(snapshot.val());
+                console.log(vm.organizations);
             }, 0);
         });
 
-        vm.select_org = function(org) {
-            vm.selected_org = org;
+
+        vm.selectOrg = function(org) {
+            vm.selectedOrg = org;
             // for (var k in org.applications) {
             //     vm.apps.push(org.applications[k]);
             // }
             // console.log(vm.apps);
         };
 
-        vm.add_app = function() {
-            if (!vm.selected_org) {
+        vm.addApp = function() {
+            if (!vm.selectedOrg) {
                 alert("Please select organizations.");
                 return;
             }
-            var new_app = apps.push({
-                'name': vm.app_name,
-                'devices': true,
-                'dev_num': vm.devices_num,
-                'owner': vm.selected_org.id
+            var newApp = apps.push({
+                'name': vm.appName,
+                'devices': {},
+                'devNum': vm.devNum,
+                'owner': vm.selectedOrg.id
             }, function(err) {
                 if (err) {
                     console.log(err);
                 }
             });
-            var key = new_app.key;
-            organizations.child(vm.selected_org.id).child('applications/' + new_app.key).set(vm.app_name);
+            var key = newApp.key;
+            organizations.child(vm.selectedOrg.id).child('applications/' + newApp.key).set(vm.appName);
+            vm.selectedOrg.applications[newApp.key] = vm.appName;
             $('#add_app').modal('hide');
+
+            vm.appName = null;
+            vm.devNum = null;
         };
     }
 })();
