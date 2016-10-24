@@ -3,6 +3,7 @@ package ini_google.ad_hoc_building_sensor_devices;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -10,9 +11,12 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +44,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     private static String android_id;
     private Button scanButton;
     private TextView textView, connectedList;
+    private EditText urlText;
+    private String configURL;
     private static String device_hash;
     private int triggerPoint=0;
 
@@ -49,6 +55,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private DatabaseReference deviceConfig;
     private DatabaseReference appDataStore;
     private ValueEventListener deviceListListener;
+    private JSONObject configuration;
 
 
     @Override
@@ -62,23 +69,33 @@ public class MainActivity extends Activity implements SensorEventListener {
         textView = (TextView) findViewById(R.id.textView);
         connectedList = (TextView) findViewById(R.id.connectedList);
         scanButton = (Button) findViewById(R.id.scanButton);
+        urlText = (EditText) findViewById(R.id.config_url);
+
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = null;
         device_hash = "";
 
-//        devices.child(android_id).onDisconnect().removeValue(new DatabaseReference.CompletionListener() {
-//            @Override
-//            public void onComplete(DatabaseError error, DatabaseReference firebase) {
-//                if (error != null) {
-//                    System.out.println("could not establish onDisconnect event:" + error.getMessage());
-//                }
-//            }
-//        });
-
-
 
         scanButton.setTransformationMethod(null);
         final Activity activity = this;
+        urlText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                configURL = s.toString();
+                downloadConfig(configURL);
+
+            }
+        });
 
         /**
          * Start scanning function with zxing library
@@ -97,6 +114,60 @@ public class MainActivity extends Activity implements SensorEventListener {
         });
     }
 
+    private void downloadConfig(String firebaseURL){
+                            //appDataStore = database.getReferenceFromUrl(firebaseURL);
+                //textView.setText(extractUrls(firebaseURL));
+                deviceConfig = database.getReferenceFromUrl(extractUrls(firebaseURL));
+                deviceConfig.addListenerForSingleValueEvent(
+                    new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        /*
+                            TODO: Gobi, dataSnapshot.getValue() returns the config file
+                            see what you want to do with it. I comment out your json part.
+                            since now the information in json, is in dataSnapshot.
+                            */
+                            JSONObject config;
+                            try{
+                                config = new JSONObject((HashMap) dataSnapshot.getValue());
+                                setConfiguration(config);
+                                configureSensors();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                            }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.w(TAG, "getUser:onCancelled", databaseError.toException());
+                            // ...
+                        }
+                    });
+           }
+
+    private void configureSensors(){
+        try {
+            textView.setText(getConfiguration().toString());
+            appDataStore = database.getReferenceFromUrl(getConfiguration().get("data_store").toString()).child(getConfiguration().get("stream").toString());
+            appDataStore.child(android_id).child(Long.toString(new Date().getTime())).setValue("Connected");
+            textView.setText("connected");
+            mSensor = mSensorManager.getDefaultSensor(Integer.parseInt(getConfiguration().get("sensor_type").toString()));
+            triggerPoint = Integer.parseInt(getConfiguration().get("trigger").toString());
+            if(mSensor==null){
+                        textView.setText("Sensor not available in phone");
+                    }
+                    else{
+                        mSensorManager.registerListener(this,mSensor,Integer.parseInt(getConfiguration().get("interval").toString())*100000);
+                    }
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+         }
+
     //QR code
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
@@ -111,51 +182,16 @@ public class MainActivity extends Activity implements SensorEventListener {
                 // start google search activity immediately
                 //System.out.println("result: " + result.getContents());
 
-                device_hash = result.getContents();
-                textView = (TextView) findViewById(R.id.textView);
-                textView.setText(device_hash);
-                JSONObject configReader = null;
+                configURL = result.getContents();
+                textView.setText(configURL);
+                //JSONObject configReader = null;
 
-                deviceConfig = devices.child(device_hash);
-                HashMap<String, Object> id = new HashMap<String, Object>();
-                id.put("device_id", android_id);
-                deviceConfig.updateChildren(id);
-//                try {
-//                    configReader = new JSONObject(config);
-//                    appDataStore = database.getReferenceFromUrl(configReader.get("firebase_url").toString()).child((String) configReader.get("stream"));
-//                    appDataStore.child(android_id).child(Long.toString(new Date().getTime())).setValue("Connected");
-//                    mSensor = mSensorManager.getDefaultSensor(Integer.parseInt(configReader.get("sensor_type").toString()));
-//                    triggerPoint = Integer.parseInt(configReader.get("trigger").toString());
-//                    if(mSensor==null){
-//                        textView.setText("Sensor not available in phone");
-//                    }
-//                    else{
-//                        mSensorManager.registerListener(this,mSensor,Integer.parseInt(configReader.get("interval").toString())*100000);
-//                    }
-//                }
-//                catch (final JSONException e) {
-//                    Log.e(TAG, "Json parsing error: " + e.getMessage());}
-//                catch(Exception e){
-//                    Log.e(TAG,e.getMessage());
-//                }
-                deviceConfig.addListenerForSingleValueEvent(
-                        new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                                        /*
-                            TODO: Gobi, dataSnapshot.getValue() returns the config file
-                            see what you want to do with it. I comment out your json part.
-                            since now the information in json, is in dataSnapshot.
-                            */
-                                System.out.println(dataSnapshot.getValue());
-                            }
+                //deviceConfig = devices.child(device_hash);
+                //HashMap<String, Object> id = new HashMap<String, Object>();
+                //id.put("device_id", android_id);
+                //deviceConfig.updateChildren(id);
+//
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                                Log.w(TAG, "getUser:onCancelled", databaseError.toException());
-                                // ...
-                            }
-                        });
             }
         } else {
             //empty
@@ -199,5 +235,21 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+    private void setConfiguration(JSONObject config)
+    {
+        this.configuration = config;
+    }
+    private JSONObject getConfiguration()
+    {
+        return this.configuration;
+    }
+    private void turnOnFlashLight()
+    {
+
+    }
+    private void turnOffFlashLight()
+    {
+        
     }
 }
