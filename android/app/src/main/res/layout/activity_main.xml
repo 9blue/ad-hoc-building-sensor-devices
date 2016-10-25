@@ -9,80 +9,51 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="ini_google.ad_hoc_building_sensor_devices.MainActivity">
 
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tableLayout">
-
-
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/connectedList"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
-                android:background="@android:color/holo_blue_light"
-                android:textColor="@android:color/white"
-                android:textSize="32sp"
-                android:layout_marginBottom="10dp"
-                android:text=""/>
-        </TableRow>
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:hint="Enter the URL for congfiguration"
-
-                android:id="@+id/config_url"
-                android:layout_column="0"
-                android:layout_alignParentStart="true"
-                android:textSize="16dp"/>
-        </TableRow>
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="364dp"
-                android:layout_height="wrap_content"
-                android:text="or"
-                android:id="@+id/textView"
-                android:textAlignment="center"
-                android:background="#ffffff"
-                android:textSize="32dp"
-                android:textColor="#252222"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true" />
-        </TableRow>
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="SCAN"
-                android:id="@+id/scanButton"
-                android:layout_column="0"
-                android:layout_alignParentStart="true"
-                android:textSize="16dp"/>
-        </TableRow>
-    </TableLayout>
-
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/linearLayout">
+        android:layout_height="match_parent"
+        android:weightSum="1"
+        android:layout_above="@+id/startButton">
 
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:id="@+id/urlTextView"
+            android:hint="Enter URL"
+            android:layout_weight="0.1"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/orTextView"
+            android:textSize="20sp"
+            android:text="OR"
+            android:layout_weight="0.10"
+            android:gravity="center"
+            android:textStyle="bold|italic"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Scan QR Code"
+            android:id="@+id/scanButton"
+            android:layout_weight="0.10"
+            android:textSize="20sp"/>
 
     </LinearLayout>
-  />
 
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:text="Deploy"
+        android:id="@+id/startButton"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.10"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        />
 </RelativeLayout>
