@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.support.v7.app.AppCompatActivity;
@@ -50,10 +51,9 @@ public class MainActivity extends AppCompatActivity {
 
     // Firebase instance variables
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
-    private DatabaseReference devices = database.getReference().child("devices");
+    //private DatabaseReference devices = database.getReference().child("devices");
     private DatabaseReference deviceConfig;
-    private DatabaseReference appDataStore;
-    private ValueEventListener deviceListListener;
+    private DatabaseReference actuationLocation;
     private JSONObject configFromFireBase;
 
 
@@ -191,12 +191,12 @@ public class MainActivity extends AppCompatActivity {
     }
     private void setupActuation(JSONObject config){
         try {
-            appDataStore = database.getReferenceFromUrl(config.get("data_store").toString());
-            appDataStore.addValueEventListener(new ValueEventListener() {
+            actuationLocation = database.getReferenceFromUrl(config.get("data_store").toString()).child(androidID);
+            actuationLocation.addValueEventListener(new ValueEventListener() {
 
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Boolean flashON = (Boolean) dataSnapshot.getValue();
-                    if(flashON){
+                    String flashON = dataSnapshot.getValue().toString();
+                    if(flashON.equals("true")){
                         turnOnFlashLight();
                     }
                     else {
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
+                        System.out.println(databaseError.toString());
                 }
             });
 
@@ -221,7 +221,10 @@ public class MainActivity extends AppCompatActivity {
             CameraCharacteristics cameraCharacteristics = mCameraManager.getCameraCharacteristics("0");
             boolean flashAvailable = cameraCharacteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
             if (flashAvailable) {
-                mCameraManager.setTorchMode("0",true);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    mCameraManager.setTorchMode("0",true);
+                }
+
             }
         }
         catch (Exception e) {
@@ -233,7 +236,11 @@ public class MainActivity extends AppCompatActivity {
             CameraCharacteristics cameraCharacteristics = mCameraManager.getCameraCharacteristics("0");
             boolean flashAvailable = cameraCharacteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
             if (flashAvailable) {
-                mCameraManager.setTorchMode("0",false);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    mCameraManager.setTorchMode("0",false);
+                    textView.setText("Flash Off");
+                }
+
             }
         }
         catch (Exception e){
