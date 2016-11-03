@@ -1,10 +1,15 @@
 package ini_google.ad_hoc_building_sensor_devices;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -17,12 +22,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.zxing.common.StringUtils;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
     private JSONObject configFromFireBase;
 
 
+    private CameraManager mCameraManager;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,18 +68,36 @@ public class MainActivity extends AppCompatActivity {
         //Fetch Android ID after all the components have been created
         androidID = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
 
-        //textView = (TextView) findViewById(R.id.textView);
+        textView = (TextView) findViewById(R.id.orTextView);
         //connectedList = (TextView) findViewById(R.id.connectedList);
         urlTextView = (EditText) findViewById(R.id.urlTextView);
         scanButton = (Button) findViewById(R.id.scanButton);
         startButton = (Button) findViewById(R.id.startButton);
-        targetURL = null;
+        targetURL = "";
+        mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
         //scanButton.setTransformationMethod(null);
 
         /**
          * Start scanning function with zxing library
          */
+        urlTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                targetURL = s.toString();
+                textView.setText(targetURL);
+            }
+        });
         scanButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //Propagate Main Activity to IntentIntegrator
@@ -90,11 +119,20 @@ public class MainActivity extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         try {
                             configFromFireBase = new JSONObject((HashMap) dataSnapshot.getValue());
-                            System.out.println("config1: " + configFromFireBase);
-                            Intent intent = new Intent(activity, SensorActivity.class);
-                            intent.putExtra("sensorConfig", configFromFireBase.toString());
-                            startActivity(intent);
+                            Iterator<String> configParameters = configFromFireBase.keys();
+                            while(configParameters.hasNext()) {
+                                String configParameter = configParameters.next();
+                                JSONObject config = new JSONObject(configFromFireBase.get(configParameter).toString());
 
+                                if (config.get("type").toString().equals("LIGHT")) {
+                                    textView.setText(config.toString());
+                                    Intent intent = new Intent(activity, SensorActivity.class);
+                                    intent.putExtra("sensorConfig", config.toString());
+                                    startActivity(intent);
+                                } else if (config.get("type").toString().equals("FLASH")) {
+                                    setupActuation(config);
+                                }
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -151,4 +189,56 @@ public class MainActivity extends AppCompatActivity {
 
         return "";
     }
+    private void setupActuation(JSONObject config){
+        try {
+            appDataStore = database.getReferenceFromUrl(config.get("data_store").toString());
+            appDataStore.addValueEventListener(new ValueEventListener() {
+
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Boolean flashON = (Boolean) dataSnapshot.getValue();
+                    if(flashON){
+                        turnOnFlashLight();
+                    }
+                    else {
+                        turnOffFlashLight();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+    private void turnOnFlashLight() {
+        //here to judge if flash is available
+        try{
+            CameraCharacteristics cameraCharacteristics = mCameraManager.getCameraCharacteristics("0");
+            boolean flashAvailable = cameraCharacteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
+            if (flashAvailable) {
+                mCameraManager.setTorchMode("0",true);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private void turnOffFlashLight() {
+        try{
+            CameraCharacteristics cameraCharacteristics = mCameraManager.getCameraCharacteristics("0");
+            boolean flashAvailable = cameraCharacteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
+            if (flashAvailable) {
+                mCameraManager.setTorchMode("0",false);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 }
