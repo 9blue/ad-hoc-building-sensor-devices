@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-adhocAPP.controller('appInstallerController', appInstallerController);
+    madAPP.controller('appInstallerController', appInstallerController);
 
     function appInstallerController($stateParams) {
         var vm = this;
@@ -8,4 +8,3 @@ adhocAPP.controller('appInstallerController', appInstallerController);
         vm.text = 'test text!';
     }
 })();
-

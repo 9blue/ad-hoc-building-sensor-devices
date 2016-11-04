@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    adhocAPP.service('QRService', QRService);
+    madAPP.service('QRService', QRService);
 
     function QRService($http, $q) {
         var qr_url = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=';

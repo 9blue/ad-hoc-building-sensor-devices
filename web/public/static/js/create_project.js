@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    adhocAPP.controller('createProjController', createProjController);
+    madAPP.controller('createProjController', createProjController);
 
     function createProjController() {
         var vm = this;
@@ -10,9 +10,6 @@
 
         this.createProject = function(){
             vm.qr_src = qr_url + "Hello, world";
-
-
-
         };
     }
 })();

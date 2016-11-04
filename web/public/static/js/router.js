@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    adhocAPP.config(function($stateProvider, $urlRouterProvider) {
+    madAPP.config(function($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise('/home');
 
         $stateProvider
@@ -25,14 +25,14 @@
             url: '/logic_builder',
             templateUrl: '/template/logicBuilder.html',
             controller: 'logicBuilderController',
-            controllerAs: 'ai'
+            controllerAs: 'lb'
         })
 
         .state('app_installer', {
             url: '/app_installer',
             templateUrl: '/template/appInstaller.html',
             controller: 'appInstallerController',
-            controllerAs: 'lb'
+            controllerAs: 'ai'
         })
 
         // project template view

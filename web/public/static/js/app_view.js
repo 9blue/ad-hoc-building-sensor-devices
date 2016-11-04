@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    adhocAPP.controller('appViewController', appViewController);
+    madAPP.controller('appViewController', appViewController);
 
     function appViewController($stateParams, $timeout) {
         var vm = this;

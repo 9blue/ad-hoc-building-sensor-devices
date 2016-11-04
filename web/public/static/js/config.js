@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    adhocAPP.controller('configController', configController);
+    madAPP.controller('configController', configController);
 
     function configController($stateParams) {
         var vm = this;
