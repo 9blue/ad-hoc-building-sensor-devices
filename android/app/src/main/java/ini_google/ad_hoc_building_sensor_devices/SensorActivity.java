@@ -39,7 +39,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     private Button cancelButton;
     private SensorManager mSensorManager;
     private Sensor mSensor;
-    private int triggerPoint;
+    private int lowerThreshold,upperThreshold;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,6 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = null;
-        triggerPoint = 0;
 
         try {
             sensorConfig = new JSONObject((String) bundle.get("sensorConfig"));
@@ -69,13 +68,13 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             e.printStackTrace();
         }
 
-        cancelButton.setOnClickListener(new View.OnClickListener(){
+        /*cancelButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setClass(activity, MainActivity.class);
                 startActivity(intent);
             }
-        });
+        });*/
     }
 
 
@@ -84,25 +83,30 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             //textView.setText(getConfiguration().toString());
             //String sensor = (String) sensorConfig.get("stream");
             //System.out.println("sensor: " + sensor);
-            appDataStore = database.getReferenceFromUrl(sensorConfig.get("data_store").toString()).child(sensorConfig.get("stream").toString());
-            appDataStore.child(androidID).child(Long.toString(new Date().getTime())).setValue("Connected");
+            appDataStore = database.getReferenceFromUrl(sensorConfig.get("data_store").toString());
+            //appDataStore.child(androidID).child(Long.toString(new Date().getTime())).setValue("Connected");
 
             statusView.setText("Status: Connected Now!!");
-            System.out.println("sensortype: " + sensorConfig.get("sensor_type").toString());
-            int sensorType = Integer.parseInt(sensorConfig.get("sensor_type").toString());
+            //System.out.println("sensortype: " + sensorConfig.get("sensor_type").toString());
+            //int sensorType = Integer.parseInt(sensorConfig.get("sensor_type").toString());
             //System.out.println("sensortype: " + (String) sensorConfig.get("sensor_type"));
 
-            mSensor = mSensorManager.getDefaultSensor(Integer.parseInt(sensorConfig.get("sensor_type").toString()));
-
-            triggerPoint = Integer.parseInt(sensorConfig.get("trigger").toString());
-            System.out.println("trigger:" + triggerPoint);
+            if(sensorConfig.get("type").toString().equals("LIGHT")) {
+                mSensor = mSensorManager.getDefaultSensor(5);
+            }
+            else{
+                sensorValue.setText("Sensor not supported");
+            }
+            JSONObject thresholds = new JSONObject(sensorConfig.get("threshold").toString());
+            lowerThreshold = Integer.parseInt(thresholds.get("lower").toString());
+            upperThreshold = Integer.parseInt(thresholds.get("upper").toString());
 
             if(mSensor==null){
                 taskView.setText("Sensor Not Available");
             } else{
-                taskView.setText(sensorConfig.get("application_name").toString());
+                //taskView.setText(sensorConfig.get("application_name").toString());
                 System.out.println("Job Is Running");
-                int interval = Integer.parseInt(sensorConfig.get("interval").toString())*1000000;
+                int interval = Integer.parseInt(sensorConfig.get("sampling_rate").toString())*1000000;
                 mSensorManager.registerListener(this,mSensor,interval);
             }
 
@@ -123,19 +127,15 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 //        }
 //    }
 
-    private void turnOnFlashLight() {
-
-    }
-    private void turnOffFlashLight() {
-    }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         float lux = event.values[0];
         sensorValue.setText(Float.toString(lux));
-        if(lux>triggerPoint)
+
+        if(lux<upperThreshold && lux>lowerThreshold)
         {
-            appDataStore.child(device_id).child(Long.toString(new Date().getTime())).setValue(Float.toString(lux));
+            appDataStore.child(device_id).setValue(Float.toString(lux));
         }
     }
 

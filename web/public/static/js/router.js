@@ -43,6 +43,13 @@
             controllerAs: 'av'
         })
 
+        .state('demo', {
+            url: '/demo',
+            templateUrl: '/template/demo.html',
+            controller: 'demoViewController',
+            controllerAs: 'dv'
+        })
+
         .state('create_project', {
             url: '/create_project',
             templateUrl: '/template/config.html',
