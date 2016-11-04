@@ -1,0 +1,54 @@
+<style>
+label{
+display:inline-block;
+width:200px;
+margin-right:30px;
+text-align:right;
+}
+
+fieldset{
+border:none;
+width:500px;
+margin:0px auto;
+}
+</style>
+
+<div class="row">
+  <p> {{ai.text}} </p>
+  <label for="appname">Application Name:</label>
+  <input id="appname" placeholder="name your application" type="text"/>
+  </br>
+  <label for="owner">Owner:</label>
+  <input id="owner" placeholder="Enter your name" type="text"/>
+  </br>
+  <label for="appurl">Application URL:</label>
+  <input id="appurl" type="text"/>
+  </br>
+  <label for="summary">Summary:</label>
+  <textarea id="summary"> </textarea>
+  </br>
+  <label for="tags">Tags:</label>
+  <input id="tags" type="text" placeholder="enter tags for your application" />
+  </br>
+  <div data-ng-repeat="choice in ai.choices">
+      <label>Sensor:</label>
+        <div class="dropdown" style="display: inline;">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Select a sensor
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li ng-repeat="c in ai.organizations track by $index" ng-click="ai.selectOrg(c)"><a href="#">{{c.name}}</a></li>
+            </ul>
+        </div>
+        <label style="display: inline;">Set range:</label>
+        <a data-toggle="modal" data-target="#thresh_info"> ? </a>
+        <input id="choice.name+l" type="text" style="width: 40px"/>
+        <span> - </span>
+        <input id="choice.name+m" type="text" style="width: 40px"/>
+        <button class="remove" ng-click="removeChoice()">-</button>
+    </div>
+    <button class="addfields" ng-click="addNewChoice()">Add sensors</button>
+</div>
+<div ng-include="ai.modalTemplate"></div>
+

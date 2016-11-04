@@ -21,6 +21,20 @@
             controllerAs: 'cc'
         })
 
+        .state('logic_builder', {
+            url: '/logic_builder',
+            templateUrl: '/template/logicBuilder.html',
+            controller: 'logicBuilderController',
+            controllerAs: 'ai'
+        })
+
+        .state('app_installer', {
+            url: '/app_installer',
+            templateUrl: '/template/appInstaller.html',
+            controller: 'appInstallerController',
+            controllerAs: 'lb'
+        })
+
         // project template view
         .state('app', {
             url: '/app/:id',
