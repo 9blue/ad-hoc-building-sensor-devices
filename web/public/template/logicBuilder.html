@@ -1,42 +1,36 @@
-<script type="text/ng-template" id="/light.html">
-  Content of the Light.
-</script>
-<script type="text/ng-template" id="/camera.html">
-  Content of the Camera.
-</script>
-<script type="text/ng-template" id="/sound.html">
-  Content of the Sound.
-</script>
 <div class="row">
     <div class="col-md-6">
         <form>
             <div class="form-group">
                 <label>Application Name</label>
-                <input type="text" class="form-control" ng-model="proj_name" placeholder="Application Name" required="required">
+                <input type="text" class="form-control" ng-model="lb.new_app.app_name" placeholder="Application Name" required="required">
             </div>
             <div class="form-group">
                 <label>Owner</label>
-                <input type="text" class="form-control" ng-model="owner" placeholder="Owner" required="required">
+                <input type="text" class="form-control" ng-model="lb.new_app.owner" placeholder="Owner" required="required">
             </div>
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" class="form-control" ng-model="email" placeholder="Email address" required="required">
+                <input type="email" class="form-control" ng-model="lb.new_app.email" placeholder="Email address" required="required">
             </div>
             <div class="form-group">
                 <label>Application Url</label>
-                <input type="text" class="form-control" ng-model="app_url" placeholder="Application Url" required="required">
+                <input type="text" class="form-control" ng-model="lb.new_app.app_url" placeholder="Application Url" required="required">
             </div>
             <div class="form-group">
                 <label>Description</label>
-                <textarea type="text" class="form-control" ng-model="app_desc" placeholder="Application Description" required="required"></textarea>
+                <textarea type="text" class="form-control" ng-model="lb.new_app.desc" placeholder="Application Description" required="required"></textarea>
             </div>
             <div ng-repeat="t in lb.added_sensors track by $index" ng-include="t"></div>
             <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label group by s.type for s in lb.sensor_list" ng-model="lb.new_sensor"></select>
             <button type="button" ng-click="lb.addSensor()" class="btn btn-default">Add Sensor</button>
+            <div class="form-group">
+                <button type="button" ng-click="lb.createdApp()" class="btn btn-default">Create Application</button>
+            </div>
         </form>
     </div>
     <div class="col-md-6">
-        <p> {{ai.text}} </p>
+<!--         <p> {{ai.text}} </p>
         <label for="appname">Application Name:</label>
         <input id="appname" placeholder="name your application" type="text" />
         </br>
@@ -70,7 +64,7 @@
             <input id="choice.name+m" type="text" style="width: 40px" />
             <button class="remove" ng-click="removeChoice()">-</button>
         </div>
-        <button class="addfields" ng-click="addNewChoice()">Add sensors</button>
+        <button class="addfields" ng-click="addNewChoice()">Add sensors</button> -->
     </div>
 </div>
 <div ng-include="ai.modalTemplate"></div>

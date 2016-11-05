@@ -10,40 +10,29 @@
 
         lb.sensor_list = [
             { name: 'light', label: 'Light Sensor', type: 'dark' },
-            { name: 'sound', label: 'Sound Sensor', type: 'light'},
+            { name: 'sound', label: 'Sound Sensor', type: 'light' },
             { name: 'camera', label: 'Camera', type: 'dark' },
         ];
         lb.new_sensor = lb.sensor_list[1];
         lb.addSensor = function() {
-            lb.added_sensors.push(lb.new_sensor.name + '.html');
+            lb.added_sensors.push('/template/sensors_tpl/' + lb.new_sensor.name + '.html');
             console.log(lb.new_sensor);
         };
 
+        lb.createdApp = function() {
+            console.log(lb.new_app);
+        };
         lb.modalTemplate = "template/thresholdInfo.html";
 
-
-
-
         var dbRef = firebase.database().ref();
+        var appRef = dbRef.child('apps');
+
         var organizations = dbRef.child('organizations');
         var apps = dbRef.child('applications');
         lb.organizations = [];
 
         lb.selectedOrg = null;
 
-        // to be replaced by sensor list
-        // organizations.once('value').then(function(snapshot) {
-        //     $timeout(function() {
-        //         if (!lb.selectedOrg) {
-        //             var orgs = snapshot.val();
-        //             for (var k in orgs) {
-        //                 lb.organizations.push(orgs[k]);
-        //             }
-        //             lb.selectedOrg = lb.organizations[0];
-        //         }
-        //         console.log(lb.organizations);
-        //     }, 0);
-        // });
 
         lb.id = $stateParams.id;
         lb.text = 'This is app installer!';
