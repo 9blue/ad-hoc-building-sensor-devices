@@ -1,1 +1,21 @@
-<input type="" name="" placeholder="HAHAHAHA">
+<label>Sensor Threshold:</label>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>Sampling Rate:</label>
+            <input type="text" class="form-control" ng-model="lb.new_app.default_config.light.sampling_rate" required="required">
+        </div>
+    </div>  
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>Minimum</label>
+            <input type="text" class="form-control" ng-model="lb.new_app.default_config.light.threshold.lower" required="required">
+        </div>
+    </div>
+	<div class="col-md-4">
+        <div class="form-group">
+            <label>Maximum</label>
+            <input type="text" class="form-control" ng-model="lb.new_app.default_config.light.threshold.upper" required="required">
+        </div>
+	</div>
+</div>	

@@ -24,47 +24,16 @@
             <div ng-repeat="t in lb.added_sensors track by $index" ng-include="t"></div>
             <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label group by s.type for s in lb.sensor_list" ng-model="lb.new_sensor"></select>
             <button type="button" ng-click="lb.addSensor()" class="btn btn-default">Add Sensor</button>
+
+            <div ng-include="lb.added_acturator"></div>
+            <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label for s in lb.acturator_list" ng-change="lb.addActurator()" ng-model="lb.new_acturator"></select>
+            
             <div class="form-group">
                 <button type="button" ng-click="lb.createdApp()" class="btn btn-default">Create Application</button>
             </div>
         </form>
     </div>
     <div class="col-md-6">
-<!--         <p> {{ai.text}} </p>
-        <label for="appname">Application Name:</label>
-        <input id="appname" placeholder="name your application" type="text" />
-        </br>
-        <label for="owner">Owner:</label>
-        <input id="owner" placeholder="Enter your name" type="text" />
-        </br>
-        <label for="appurl">Application URL:</label>
-        <input id="appurl" type="text" />
-        </br>
-        <label for="summary">Summary:</label>
-        <textarea id="summary"> </textarea>
-        </br>
-        <label for="tags">Tags:</label>
-        <input id="tags" type="text" placeholder="enter tags for your application" />
-        </br>
-        <div data-ng-repeat="choice in ai.choices">
-            <label>Sensor:</label>
-            <div class="dropdown" style="display: inline;">
-                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    Select a sensor
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li ng-repeat="c in ai.organizations track by $index" ng-click="ai.selectOrg(c)"><a href="#">{{c.name}}</a></li>
-                </ul>
-            </div>
-            <label style="display: inline;">Set range:</label>
-            <a data-toggle="modal" data-target="#thresh_info"> ? </a>
-            <input id="choice.name+l" type="text" style="width: 40px" />
-            <span> - </span>
-            <input id="choice.name+m" type="text" style="width: 40px" />
-            <button class="remove" ng-click="removeChoice()">-</button>
-        </div>
-        <button class="addfields" ng-click="addNewChoice()">Add sensors</button> -->
     </div>
 </div>
 <div ng-include="ai.modalTemplate"></div>
