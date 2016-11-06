@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-md-6">
-        <form>
+        <form ng-submit="lb.createdApp()">
             <div class="form-group">
                 <label>Application Name</label>
                 <input type="text" class="form-control" ng-model="lb.new_app.app_name" placeholder="Application Name" required="required">
@@ -21,19 +21,18 @@
                 <label>Description</label>
                 <textarea type="text" class="form-control" ng-model="lb.new_app.desc" placeholder="Application Description" required="required"></textarea>
             </div>
-            <div ng-repeat="t in lb.added_sensors track by $index" ng-include="t"></div>
-            <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label group by s.type for s in lb.sensor_list" ng-model="lb.new_sensor"></select>
-            <button type="button" ng-click="lb.addSensor()" class="btn btn-default">Add Sensor</button>
-
-            <div ng-include="lb.added_acturator"></div>
-            <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label for s in lb.acturator_list" ng-change="lb.addActurator()" ng-model="lb.new_acturator"></select>
-            
             <div class="form-group">
-                <button type="button" ng-click="lb.createdApp()" class="btn btn-default">Create Application</button>
+                <div ng-repeat="t in lb.added_sensors track by $index" ng-include="t"></div>
+                <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label group by s.type for s in lb.sensor_list" ng-model="lb.new_sensor"></select>
+                <button type="button" ng-click="lb.addSensor()" class="btn btn-default">Add Sensor</button>
+            </div>
+            <div class="form-group">
+                <div ng-include="lb.added_acturator"></div>
+                <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label for s in lb.acturator_list" ng-change="lb.addActurator()" ng-model="lb.new_acturator"></select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-default">Create Application</button>
             </div>
         </form>
     </div>
-    <div class="col-md-6">
-    </div>
 </div>
-<div ng-include="ai.modalTemplate"></div>
