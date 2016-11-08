@@ -7,13 +7,16 @@
         var dbRef = firebase.database().ref();
         var appRef = dbRef.child('apps');
 
+        lb.sensor_types = ["light", "camera", "sound"];
         lb.added_sensors = [];
 
         lb.sensor_list = sensorService.getSensors();
 
         lb.new_sensor = lb.sensor_list[0];
+
         lb.addSensor = function() {
-            lb.added_sensors.push(lb.new_sensor.tpl_url);
+            console.log(lb.new_app);
+            lb.added_sensors.push(lb.new_sensor);
             console.log(lb.new_sensor);
         };
 
@@ -25,6 +28,10 @@
         };
 
         lb.createdApp = function() {
+            if (!lb.new_app.default_config) {
+                alert("Please add atleast one sensor");
+                return;
+            }
             var newApp = appRef.push(
                 lb.new_app,
                 function(err) {

@@ -22,7 +22,10 @@
                 <textarea type="text" class="form-control" ng-model="lb.new_app.desc" placeholder="Application Description" required="required"></textarea>
             </div>
             <div class="form-group">
-                <div ng-repeat="t in lb.added_sensors track by $index" ng-include="t"></div>
+                <div ng-repeat = "st in lb.sensor_types">
+                    <div ng-repeat="t in lb.added_sensors | filter:{name:st} track by $index" ng-include="t.tpl_url">        
+                    </div>
+                </div>
                 <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label group by s.type for s in lb.sensor_list" ng-model="lb.new_sensor"></select>
                 <button type="button" ng-click="lb.addSensor()" class="btn btn-default">Add Sensor</button>
             </div>
