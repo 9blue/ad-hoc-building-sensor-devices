@@ -15,8 +15,6 @@
         lb.new_sensor = lb.sensor_list[0];
 
         lb.addSensor = function() {
-
-            console.log(new Date().toLocaleString());
             lb.added_sensors.push(lb.new_sensor);
             console.log(lb.new_sensor);
         };
