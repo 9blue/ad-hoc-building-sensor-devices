@@ -15,7 +15,8 @@
         lb.new_sensor = lb.sensor_list[0];
 
         lb.addSensor = function() {
-            console.log(lb.new_app);
+
+            console.log(new Date().toLocaleString());
             lb.added_sensors.push(lb.new_sensor);
             console.log(lb.new_sensor);
         };
@@ -32,6 +33,7 @@
                 alert("Please add atleast one sensor");
                 return;
             }
+            lb.new_app.created_at = new Date().toLocaleString();
             var newApp = appRef.push(
                 lb.new_app,
                 function(err) {
