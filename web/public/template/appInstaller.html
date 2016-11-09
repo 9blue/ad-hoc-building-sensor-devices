@@ -1,3 +1,40 @@
 <div class="row">
-  <p> hello {{lb.text}}</p>
+    <div class="col-md-9">
+        <div class="well well-lg">
+            <div class="row">
+                <div class="col-md-8">
+                    <!-- Add application details here -->
+                    {{ai.selected_app}}
+                    <ul>
+                    <!-- having a list to show all instances -->
+                        <li ng-repeat></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-success" data-toggle="modal" data-target="#install_app" ng-click="ai.installApp()">Install</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="list-group">
+            <a class="list-group-item" ng-repeat="app in ai.apps" ng-class="{'active': app === ai.selected_app}" ng-click="ai.showDetail(app)">{{app}}</a>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="install_app" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Install {{ai.selected_app}}</h4>
+            </div>
+            <div class="modal-body">
+                Put QR COde here
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="new_app" class="btn btn-primary">Install Application</button>
+            </div>
+        </div>
+    </div>
 </div>
