@@ -9,11 +9,11 @@
                     <br/>
                     App Details: {{ai.selected_app.desc}}
                     <br/>
-                    Owner email ID: {{ai.selected_app.email}}
-                    <ul>
-                    <!-- having a list to show all instances -->
-                        <li ng-repeat></li>
-                    </ul>
+                    Contact: {{ai.selected_app.email}}
+<!--                     <ul>
+                        Current installs:
+                        <li ng-repeat="v in ai.all_installs">{{v}}</li>
+                    </ul> -->
                 </div>
                 <div class="col-md-4">
                     <button class="btn btn-success" data-toggle="modal" data-target="#install_app" ng-click="ai.installApp()">Install</button>
@@ -23,7 +23,7 @@
     </div>
     <div class="col-md-3">
         <div class="list-group">
-            <a class="list-group-item" ng-repeat="app in ai.apps" ng-class="{'active': app === ai.selected_app}" ng-click="ai.showDetail(app)">{{app.app_name}}</a>
+            <a class="list-group-item" ng-repeat="(k,v) in ai.apps" ng-class="{'active': k === ai.selected_id}" ng-click="ai.showDetail(k)">{{v.app_name}}</a>
         </div>
     </div>
 </div>
@@ -35,7 +35,13 @@
                 <h4 class="modal-title" id="myModalLabel">Install {{ai.selected_app.app_name}}</h4>
             </div>
             <div class="modal-body">
-                Put QR COde here
+                <div ng-if="ai.inst_hash">
+                    Please scan QR Code below.
+                    <img class="center-block" ng-src="https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl={{ai.inst_hash}}">
+                </div>
+                <div ng-if="!ai.inst_hash">
+                    Waiting for installation instruction.
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="submit" form="new_app" class="btn btn-primary">Install Application</button>

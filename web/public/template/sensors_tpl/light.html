@@ -1,21 +1,21 @@
-<label>Sensor Threshold:</label>
+<label>Light Sensor {{$index + 1}}</label>
 <div class="row">
     <div class="col-md-4">
         <div class="form-group">
-            <label>Sampling Rate:</label>
-            <input type="text" class="form-control" ng-model="lb.new_app.default_config['light'+($index+ 1)]['threshold']['sampling_rate']" required="required">
+            <label>Sampling Rate</label>
+            <input type="number" class="form-control" ng-model="lb.new_app.default_config['light'+($index+ 1)]['sampling_rate']" required="required">
         </div>
-    </div>  
+    </div>
     <div class="col-md-4">
         <div class="form-group">
-            <label>Minimum</label>
-            <input type="text" class="form-control" ng-model="lb.new_app.default_config['light'+($index+ 1)]['threshold']['lower']" required="required">
+            <label>Lower threshold</label>
+            <input type="number" class="form-control" ng-model="lb.new_app.default_config['light'+($index+ 1)]['threshold']['lower']" required="required">
         </div>
     </div>
 	<div class="col-md-4">
         <div class="form-group">
-            <label>Maximum</label>
-            <input type="text" class="form-control" ng-model="lb.new_app.default_config['light'+($index+ 1)]['threshold']['upper']" required="required">
+            <label>Upper threshold</label>
+            <input type="number" class="form-control" ng-model="lb.new_app.default_config['light'+($index+ 1)]['threshold']['upper']" required="required">
         </div>
 	</div>
-</div>	
+</div>
