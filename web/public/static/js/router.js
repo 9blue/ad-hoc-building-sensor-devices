@@ -14,13 +14,6 @@
         })
 
         // configuration view
-        .state('config', {
-            url: '/config',
-            templateUrl: '/template/config.html',
-            controller: 'configController',
-            controllerAs: 'cc'
-        })
-
         .state('logic_builder', {
             url: '/logic_builder',
             templateUrl: '/template/logicBuilder.html',
@@ -36,11 +29,16 @@
         })
 
         // project template view
-        .state('app', {
-            url: '/app/:id',
-            templateUrl: '/template/app_view.html',
-            controller: 'appViewController',
-            controllerAs: 'av'
+        // .state('app', {
+        //     url: '/app/:id',
+        //     templateUrl: '/template/app_view.html',
+        //     controller: 'appViewController',
+        //     controllerAs: 'av'
+        .state('create_project', {
+            url: '/create_project',
+            templateUrl: '/template/config.html',
+            controller: 'createProjController',
+            controllerAs: 'cp'
         })
 
         .state('demo', {
@@ -48,13 +46,6 @@
             templateUrl: '/template/demo.html',
             controller: 'demoViewController',
             controllerAs: 'dv'
-        })
-
-        .state('create_project', {
-            url: '/create_project',
-            templateUrl: '/template/config.html',
-            controller: 'createProjController',
-            controllerAs: 'cp'
         });
 
     });
