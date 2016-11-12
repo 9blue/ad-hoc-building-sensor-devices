@@ -1,4 +1,4 @@
-package ini_google.ad_hoc_building_sensor_devices;
+package ini_google.ad_hoc_building_sensor_devices.mad_hoc.ui;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,7 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONObject;
 
-import java.util.Date;
+import ini_google.ad_hoc_building_sensor_devices.R;
 
 public class SensorActivity extends AppCompatActivity implements SensorEventListener{
     private static final String TAG = "SensorActivity";
@@ -36,7 +36,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     private JSONObject sensorConfig;
     private static String device_id;
     private TextView statusView, sensorValue,taskView;
-    private Button cancelButton;
+    private Button sensorListButton, actuatorButton, cancelButton;
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private int lowerThreshold,upperThreshold;
@@ -48,10 +48,13 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
         taskView = (TextView) findViewById(R.id.taskView);
         statusView = (TextView) findViewById(R.id.statusView);
-        sensorValue = (TextView) findViewById(R.id.sensorValue);
+        //sensorValue = (TextView) findViewById(R.id.sensorValue);
+        sensorListButton = (Button) findViewById(R.id.sensorList);
+        actuatorButton = (Button) findViewById(R.id.actuatorList);
         cancelButton = (Button) findViewById(R.id.cancelbutton);
 
-        device_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        //device_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         Bundle bundle = getIntent().getExtras();
         androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -68,6 +71,23 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             e.printStackTrace();
         }
 
+        sensorListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(activity, ListActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        actuatorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(activity, ListActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
         /*cancelButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 Intent intent = new Intent();
@@ -77,19 +97,12 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         });*/
     }
 
-
     private void configureSensors(){
         try {
-            //textView.setText(getConfiguration().toString());
-            //String sensor = (String) sensorConfig.get("stream");
-            //System.out.println("sensor: " + sensor);
+
             appDataStore = database.getReferenceFromUrl(sensorConfig.get("data_store").toString());
-            //appDataStore.child(androidID).child(Long.toString(new Date().getTime())).setValue("Connected");
 
             statusView.setText("Status: Connected Now!!");
-            //System.out.println("sensortype: " + sensorConfig.get("sensor_type").toString());
-            //int sensorType = Integer.parseInt(sensorConfig.get("sensor_type").toString());
-            //System.out.println("sensortype: " + (String) sensorConfig.get("sensor_type"));
 
             if(sensorConfig.get("type").toString().equals("LIGHT")) {
                 mSensor = mSensorManager.getDefaultSensor(5);
@@ -144,4 +157,6 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
 
     }
+
+
 }

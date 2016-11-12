@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        <item name="FLASH" type="integer">0</item>
+        <item name="LIGHT" type="integer">5</item>
+        <item name="FLASH" type="string">Sensor</item>
+        <item name="LIGHT" type="string">Actuator</item>
+</resources>
