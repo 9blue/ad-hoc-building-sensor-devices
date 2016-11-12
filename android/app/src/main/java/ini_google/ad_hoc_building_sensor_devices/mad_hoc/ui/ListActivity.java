@@ -34,6 +34,9 @@ public class ListActivity extends AppCompatActivity {
         typeText = (TextView) findViewById(R.id.typeView);
         backButton = (Button) findViewById(R.id.backButton);
 
+        if(lookupTableInit(lookupTable)) {
+            
+        }
 
         // get the listview
         expListView = (ExpandableListView) findViewById(R.id.sensorList);
@@ -85,10 +88,9 @@ public class ListActivity extends AppCompatActivity {
 
     }
 
-    private void lookupTableInit(HashMap<String, String> lookupTable) {
+    private boolean lookupTableInit(HashMap<String, String> lookupTable) {
         // light
-        //lookupTable.put();
-
-
+        lookupTable.put();
+        lookupTable.put();
     }
 }
