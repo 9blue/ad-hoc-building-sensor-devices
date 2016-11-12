@@ -35,7 +35,7 @@ public class ListActivity extends AppCompatActivity {
         backButton = (Button) findViewById(R.id.backButton);
 
         if(lookupTableInit(lookupTable)) {
-            
+
         }
 
         // get the listview
