@@ -1,4 +1,4 @@
-package ini_google.ad_hoc_building_sensor_devices;
+package ini_google.ad_hoc_building_sensor_devices.mad_hoc.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -31,6 +31,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ini_google.ad_hoc_building_sensor_devices.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
 

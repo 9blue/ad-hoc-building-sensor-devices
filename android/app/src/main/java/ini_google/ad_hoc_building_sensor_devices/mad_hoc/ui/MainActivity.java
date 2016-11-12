@@ -1,4 +1,4 @@
-package ini_google.ad_hoc_building_sensor_devices;
+package ini_google.ad_hoc_building_sensor_devices.mad_hoc.ui;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,7 +23,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.zxing.common.StringUtils;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -32,12 +31,13 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import ini_google.ad_hoc_building_sensor_devices.R;
 
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+//    private static final String firebabeURL = "https://ad-hoc-building-sensor-devices.firbaseio.com/";
 //    private SensorManager mSensorManager;
 //    private Sensor mSensor;
     private final Activity activity = this;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private Button scanButton, startButton;
     private TextView textView, connectedList;
     private EditText urlTextView;
-    private String targetURL;
+    private String instanceID;
     private static String device_hash;
     private int triggerPoint = 0;
 
@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     //private DatabaseReference devices = database.getReference().child("devices");
     private DatabaseReference deviceConfig;
+    private DatabaseReference applicationInfo;
     private DatabaseReference actuationLocation;
     private JSONObject configFromFireBase;
 
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         urlTextView = (EditText) findViewById(R.id.urlTextView);
         scanButton = (Button) findViewById(R.id.scanButton);
         startButton = (Button) findViewById(R.id.startButton);
-        targetURL = "";
+        instanceID = "";
         mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
         //scanButton.setTransformationMethod(null);
@@ -94,8 +95,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                targetURL = s.toString();
-                textView.setText(targetURL);
+                instanceID = s.toString();
+                textView.setText(instanceID);
+                if(!instanceID.isEmpty()){
+                    downloadDefaultConfig();
+                }
             }
         });
         scanButton.setOnClickListener(new View.OnClickListener() {
@@ -113,35 +117,9 @@ public class MainActivity extends AppCompatActivity {
 
         startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                deviceConfig = database.getReferenceFromUrl(extractUrls(targetURL));
-                deviceConfig.addListenerForSingleValueEvent( new ValueEventListener() {
+                Intent intent = new Intent(activity, SensorActivity.class);
+                startActivity(intent);
 
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        try {
-                            configFromFireBase = new JSONObject((HashMap) dataSnapshot.getValue());
-                            Iterator<String> configParameters = configFromFireBase.keys();
-                            while(configParameters.hasNext()) {
-                                String configParameter = configParameters.next();
-                                JSONObject config = new JSONObject(configFromFireBase.get(configParameter).toString());
-
-                                if (config.get("type").toString().equals("LIGHT")) {
-                                    textView.setText(config.toString());
-                                    Intent intent = new Intent(activity, SensorActivity.class);
-                                    intent.putExtra("sensorConfig", config.toString());
-                                    startActivity(intent);
-                                } else if (config.get("type").toString().equals("FLASH")) {
-                                    setupActuation(config);
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.w(TAG, "getUser:onCancelled", databaseError.toException());
-                    }
-                });
             }
         });
     }
@@ -160,10 +138,12 @@ public class MainActivity extends AppCompatActivity {
                 // start google search activity immediately
                 System.out.println("result: " + result.getContents());
 
-                targetURL = extractUrls(result.getContents());
-                System.out.println("URL: " + targetURL);
-                urlTextView.setText(targetURL);
-
+                instanceID = result.getContents();
+                System.out.println("URL: " + instanceID);
+                urlTextView.setText(instanceID);
+                if(!instanceID.isEmpty()) {
+                    downloadDefaultConfig();
+                }
                 //searchOnInternet(result.getContents());
             }
         } else {
@@ -172,23 +152,66 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void downloadDefaultConfig() {
+        //reference for the application
+        applicationInfo = database.getReference("/app_ids");
+        //fetch reference of Instance
+        DatabaseReference instanceInfo = applicationInfo.child(instanceID);
+        instanceInfo.addListenerForSingleValueEvent( new ValueEventListener() {
+            public void onDataChange (DataSnapshot dataSnapshot){
+                try {
+                    //fetch application Id from firebase
+                    String appID = dataSnapshot.getValue().toString();
+                    applicationInfo = database.getReference("/apps/".concat(appID));
+                    deviceConfig = applicationInfo.child("default_config");
+                    deviceConfig.addListenerForSingleValueEvent( new ValueEventListener() {
+                        public void onDataChange (DataSnapshot dataSnapshot){
+                            try {
+                                //default config for the app from firebase
+                                configFromFireBase = new JSONObject((HashMap) dataSnapshot.getValue());
+                                Iterator<String> configParameters = configFromFireBase.keys();
+                                while (configParameters.hasNext()) {
+                                    String configParameter = configParameters.next();
+                                    JSONObject default_config = new JSONObject(configFromFireBase.get(configParameter).toString());
+
+//                        if (default_config.get("type").toString().equals("LIGHT")) {
+//                            textView.setText(default_config.toString());
+//                            Intent intent = new Intent(activity, SensorActivity.class);
+//                            intent.putExtra("sensorConfig", default_config.toString());
+//                            startActivity(intent);
+//                        } else if (default_config.get("type").toString().equals("FLASH")) {
+//                            setupActuation(default_config);
+//                        }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.w(TAG, "getUser:onCancelled", databaseError.toException());
+                        }
+                    });
+                    }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+                }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+
     /**
      * Fetch URL
      */
-    private static String extractUrls(String text) {
-        String containedUrls = null;
-        String urlRegex = "((https?|http):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
-        Pattern pattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
-        Matcher urlMatcher = pattern.matcher(text);
 
-        while (urlMatcher.find()) {
-            containedUrls = text.substring(urlMatcher.start(0),
-                    urlMatcher.end(0));
-            return containedUrls;
-        }
-
-        return "";
-    }
     private void setupActuation(JSONObject config){
         try {
             actuationLocation = database.getReferenceFromUrl(config.get("data_store").toString()).child(androidID);
