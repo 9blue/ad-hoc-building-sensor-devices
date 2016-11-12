@@ -8,22 +8,24 @@
         var appRef = dbRef.child('apps');
 
         lb.sensor_types = ["light", "camera", "sound"];
-        lb.added_sensors = [];
+        lb.actuator_types = ["flash", "screen_light"];
 
         lb.sensor_list = sensorService.getSensors();
-
         lb.new_sensor = lb.sensor_list[0];
+        lb.added_sensors = [];
+
+        lb.actuator_list = sensorService.getActuators();
+        lb.new_actuator = lb.actuator_list[0];
+        lb.added_actuators = [];
 
         lb.addSensor = function() {
             lb.added_sensors.push(lb.new_sensor);
             console.log(lb.new_sensor);
         };
 
-        lb.acturator_list = sensorService.getActurators();
-        lb.new_acturator = lb.acturator_list[0];
-
-        lb.addActurator = function() {
-            lb.added_acturator = lb.new_acturator.tpl_url;
+        lb.addActuator = function() {
+            lb.added_actuators.push(lb.new_actuator);
+            console.log(lb.new_actuator);
         };
 
         lb.createdApp = function() {
