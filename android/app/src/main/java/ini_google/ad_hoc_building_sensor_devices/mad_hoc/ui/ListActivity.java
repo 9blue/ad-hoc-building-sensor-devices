@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,7 @@ public class ListActivity extends AppCompatActivity {
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+               //use firebase code to update json
                 listAdapter.updateVal();
                 Toast.makeText(activity, "Value Updated Successfully", Toast.LENGTH_LONG).show();
             }
@@ -93,33 +95,52 @@ public class ListActivity extends AppCompatActivity {
             listDataHeader = new ArrayList<String>();
             listDataChild = new HashMap<String, List<Parameter>>();
 
-//            Iterator<?> keys = config.keys();
-//            while(keys.hasNext()) {
-//              String key = (String) keys.next();
-//              JSONObject configSensor = (JSONObject)config.get(key);
-//
-//              String type = configSensor.get("type").toString();
-//              listDataHeader.add(key);
-//              List<Parameter> child = new ArrayList<Parameter>();
-//
-//              if(lookupTable.get(type).equals("S")) {
-//                child.add(new Parameter("Threshold", "10"));
-//                  child.add(new Parameter("Fixed", "False"));
-//
-//              } else {
+            Iterator<?> keys = config.keys();
+            Parameter parameter1 = null;
+            Parameter parameter2 = null;
+            while(keys.hasNext()) {
+                String key = (String) keys.next();
+                JSONObject configSensor = (JSONObject) config.get(key);
+
+                String type = configSensor.get("type").toString();
+                listDataHeader.add(key);
+                List<Parameter> child = new ArrayList<Parameter>();
+
+//                if(lookupTable.get(type).equals("S")) {
+                if (configSensor.has("threshold")) {
+                    JSONObject params = (JSONObject) configSensor.get("threshold");
+                    if (params.get("fixed").toString().equals("false")) {
+                        if (params.has("upper")) {
+                            parameter1 = new Parameter("Threshold_upper", params.get("upper").toString());
+                        }
+                        if (params.has("lower")) {
+                            parameter2 = new Parameter("Threshold_lower", params.get("lower").toString());
+                        }
+                    } else {
+                        if (params.has("upper")) {
+
+                        }
+                        if (params.has("lower")) {
+
+                        }
+
+                    }
+
+                }
+
+                //            }
+//                else {
 //                  child.add(new Parameter("Threshold", "10"));
 //                  child.add(new Parameter("Fixed", "False"));
 //              }
-//              listDataChild.put(key, child);
-//                System.out.println("key: " + key);
-//            }
-
-            listDataHeader.add("Light");
+                listDataChild.put(key, child);
+                System.out.println("key: " + key);
+            }
             List<Parameter> child = new ArrayList<Parameter>();
-            Parameter parameter1 = new Parameter("Threshold", "10");
-            child.add(parameter1);
-            Parameter parameter2 = new Parameter("Fix", "True");
-            child.add(parameter2);
+
+            if(parameter1 != null)child.add(parameter1);
+            if(parameter2 != null)child.add(parameter2);
+
             listDataChild.put(listDataHeader.get(0), child);
 
         } catch (Exception e) {
