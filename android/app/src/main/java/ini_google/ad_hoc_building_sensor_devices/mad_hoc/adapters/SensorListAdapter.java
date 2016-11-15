@@ -63,6 +63,7 @@ public class SensorListAdapter extends BaseExpandableListAdapter{
 
             String childText = (String) ((Parameter)getChild(groupPosition, childPosition)).getItem();
             String childVal = (String) ((Parameter)getChild(groupPosition, childPosition)).getVal();
+            boolean editable = (boolean) ((Parameter)getChild(groupPosition, childPosition)).isEditable();
 
             if (convertView == null) {
                 LayoutInflater infalInflater = (LayoutInflater) this._context
@@ -81,6 +82,7 @@ public class SensorListAdapter extends BaseExpandableListAdapter{
             if(txtListChildVal.getText().toString().equals("null")) {
                 //System.out.println("childVal: " +childVal);
                 txtListChildVal.setText(childVal);
+                txtListChildVal.setFocusable(editable);
             }
             // store position
             ID curID = new ID(groupPosition, childPosition, convertView);
