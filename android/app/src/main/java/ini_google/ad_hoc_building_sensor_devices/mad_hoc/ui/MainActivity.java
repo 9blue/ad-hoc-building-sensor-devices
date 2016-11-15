@@ -30,7 +30,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import ini_google.ad_hoc_building_sensor_devices.R;
 
@@ -56,9 +55,8 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference applicationInfo;
     private DatabaseReference actuationLocation;
     private JSONObject configFromFireBase;
-
-
     private CameraManager mCameraManager;
+    private String configData;
 
 
     @Override
@@ -76,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         startButton = (Button) findViewById(R.id.startButton);
         instanceID = "";
         mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        configData = "";
 
         //scanButton.setTransformationMethod(null);
 
@@ -117,7 +116,8 @@ public class MainActivity extends AppCompatActivity {
 
         startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(activity, SensorActivity.class);
+                Intent intent = new Intent(activity, ListActivity.class);
+                intent.putExtra("configData", configData);
                 startActivity(intent);
 
             }
@@ -161,20 +161,26 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange (DataSnapshot dataSnapshot){
                 try {
                     //fetch application Id from firebase
-                    String appID = dataSnapshot.getValue().toString();
+                    String appID =  dataSnapshot.getValue().toString();
                     applicationInfo = database.getReference("/apps/".concat(appID));
                     deviceConfig = applicationInfo.child("default_config");
                     deviceConfig.addListenerForSingleValueEvent( new ValueEventListener() {
+
                         public void onDataChange (DataSnapshot dataSnapshot){
                             try {
                                 //default config for the app from firebase
                                 configFromFireBase = new JSONObject((HashMap) dataSnapshot.getValue());
-                                Iterator<String> configParameters = configFromFireBase.keys();
-                                while (configParameters.hasNext()) {
-                                    String configParameter = configParameters.next();
-                                    JSONObject default_config = new JSONObject(configFromFireBase.get(configParameter).toString());
+                                Intent intent = new Intent(activity, ListActivity.class);
+                                intent.putExtra("sensorConfig", configFromFireBase.toString());
+                                startActivity(intent);
 
-//                        if (default_config.get("type").toString().equals("LIGHT")) {
+//                                Iterator<String> configParameters = configFromFireBase.keys();
+//                                while (configParameters.hasNext()) {
+//                                    String configParameter = configParameters.next();
+//                                    JSONObject default_config = new JSONObject(configFromFireBase.get(configParameter).toString());
+//                                    configData = default_config.toString();
+//                                    System.out.println("configData: " + configData);
+////                        if (default_config.get("type").toString().equals("LIGHT")) {
 //                            textView.setText(default_config.toString());
 //                            Intent intent = new Intent(activity, SensorActivity.class);
 //                            intent.putExtra("sensorConfig", default_config.toString());
@@ -182,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 //                        } else if (default_config.get("type").toString().equals("FLASH")) {
 //                            setupActuation(default_config);
 //                        }
-                                }
+
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

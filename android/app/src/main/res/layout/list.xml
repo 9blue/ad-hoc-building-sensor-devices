@@ -23,10 +23,16 @@
         android:id="@+id/typeView"
         android:textSize="24sp"/>
 
-    <ExpandableListView
+        <ExpandableListView
         android:layout_width="fill_parent"
-        android:layout_height="383dp"
+        android:layout_height="327dp"
         android:id="@+id/sensorList"/>
+
+        <Button
+            android:text="Value Confirm "
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/confirmButton"/>
 
         <Button
             android:text="Back "

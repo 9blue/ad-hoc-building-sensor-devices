@@ -57,6 +57,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         //device_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         Bundle bundle = getIntent().getExtras();
+
         androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
