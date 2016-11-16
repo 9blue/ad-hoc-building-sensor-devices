@@ -1,5 +1,5 @@
 <label>Flash Light {{$index + 1}}</label>
-<div class="row">
+<div class="row" ng-init="lb.new_app.default_config['flash'+($index+ 1)]['type'] = 'FLASH'">
     <div class="col-md-12">
         <div class="form-group">
             <label>Type:</label>

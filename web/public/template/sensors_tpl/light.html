@@ -1,5 +1,5 @@
 <label>Light Sensor {{$index + 1}}</label>
-<div class="row">
+<div class="row" ng-init="lb.new_app.default_config['light'+($index+ 1)]['type'] = 'LIGHT'">
     <div class="col-md-3">
         <div class="form-group">
             <label>Sampling Rate</label>

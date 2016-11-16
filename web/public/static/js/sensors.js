@@ -20,7 +20,7 @@
         };
 
         ss.getSensors = function() {
-            return sensor_list; 
+            return sensor_list;
         };
     }
 })();
