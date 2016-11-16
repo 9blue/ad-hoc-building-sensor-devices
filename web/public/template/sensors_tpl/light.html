@@ -1,21 +1,27 @@
 <label>Light Sensor {{$index + 1}}</label>
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="form-group">
             <label>Sampling Rate</label>
             <input type="number" class="form-control" ng-model="lb.new_app.default_config['light'+($index+ 1)]['sampling_rate']" required="required">
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="form-group">
             <label>Lower threshold</label>
-            <input type="number" class="form-control" ng-model="lb.new_app.default_config['light'+($index+ 1)]['threshold']['lower']" required="required">
+            <input type="number" class="form-control" ng-model="lb.new_app.default_config['light'+($index+ 1)]['threshold_lower']" required="required">
         </div>
     </div>
-	<div class="col-md-4">
+    <div class="col-md-3">
         <div class="form-group">
             <label>Upper threshold</label>
-            <input type="number" class="form-control" ng-model="lb.new_app.default_config['light'+($index+ 1)]['threshold']['upper']" required="required">
+            <input type="number" class="form-control" ng-model="lb.new_app.default_config['light'+($index+ 1)]['threshold_upper']" required="required">
         </div>
-	</div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>Threshold fixed</label>
+                <input type="checkbox" ng-model="lb.new_app.default_config['light'+($index+ 1)]['threshold_fixed']" ng-init="lb.new_app.default_config['light'+($index+ 1)]['threshold_fixed'] = true" >
+        </div>
+    </div>
 </div>
