@@ -67,6 +67,7 @@ public class ListActivity extends AppCompatActivity {
             public void onClick(View v) {
                //use firebase code to update json
                 listAdapter.updateVal();
+                UpdateJson(configData);
                 Toast.makeText(activity, "Value Updated Successfully", Toast.LENGTH_LONG).show();
             }
         });
@@ -76,7 +77,7 @@ public class ListActivity extends AppCompatActivity {
             public void onClick(View v) {
                 listAdapter.updateList(listDataHeader, listDataChild);
                 listAdapter.notifyDataSetChanged();
-                UpdateJson(configData);
+
                 Intent intent = new Intent(activity, SensorActivity.class);
                 intent.putExtra("sensorConfig", configData);
                 // set data back to firebase
@@ -96,52 +97,37 @@ public class ListActivity extends AppCompatActivity {
             listDataChild = new HashMap<String, List<Parameter>>();
 
             Iterator<?> keys = config.keys();
-            Parameter parameter1 = null;
-            Parameter parameter2 = null;
+            Parameter parameter = null;
+            List<Parameter> parameters = null;
+
             while(keys.hasNext()) {
+                parameters = new ArrayList<Parameter>();
                 String key = (String) keys.next();
                 JSONObject configSensor = (JSONObject) config.get(key);
-
+                parameter = null;
                 String type = configSensor.get("type").toString();
                 listDataHeader.add(key);
-                List<Parameter> child = new ArrayList<Parameter>();
 
-//                if(lookupTable.get(type).equals("S")) {
-                if (configSensor.has("threshold")) {
-                    JSONObject params = (JSONObject) configSensor.get("threshold");
-                    if (params.get("fixed").toString().equals("false")) {
-                        if (params.has("upper")) {
-                            parameter1 = new Parameter("Threshold_upper", params.get("upper").toString());
-                        }
-                        if (params.has("lower")) {
-                            parameter2 = new Parameter("Threshold_lower", params.get("lower").toString());
-                        }
-                    } else {
-                        if (params.has("upper")) {
-
-                        }
-                        if (params.has("lower")) {
-
-                        }
-
-                    }
-
+                if (configSensor.has("threshold_upper")) {
+                    parameter = null;
+                    parameter = new Parameter("Upper Threshold", configSensor.get("threshold_upper").toString(),"Int",configSensor.get("threshold_fixed").toString());
+                    parameters.add(parameter);
                 }
-
-                //            }
-//                else {
-//                  child.add(new Parameter("Threshold", "10"));
-//                  child.add(new Parameter("Fixed", "False"));
-//              }
-                listDataChild.put(key, child);
-                System.out.println("key: " + key);
+                if(configSensor.has("threshold_lower")) {
+                    parameter = null;
+                    parameter = new Parameter("Lower Threshold", configSensor.get("threshold_lower").toString(),"Int",configSensor.get("threshold_fixed").toString());
+                    parameters.add(parameter);
+                }
+                if(configSensor.has("sampling_rate")) {
+                    parameter = null;
+                    parameter = new Parameter("Sampling Rate", configSensor.get("sampling_rate").toString(),"Int",configSensor.get("threshold_fixed").toString());
+                    parameters.add(parameter);
+                }
+                listDataChild.put(listDataHeader.get(listDataHeader.indexOf(key)), parameters);
             }
-            List<Parameter> child = new ArrayList<Parameter>();
 
-            if(parameter1 != null)child.add(parameter1);
-            if(parameter2 != null)child.add(parameter2);
 
-            listDataChild.put(listDataHeader.get(0), child);
+
 
         } catch (Exception e) {
             Toast.makeText(this, "Configuration Error", Toast.LENGTH_LONG).show();
@@ -184,13 +170,17 @@ public class ListActivity extends AppCompatActivity {
     public class Parameter{
         String item;
         String val;
-        Parameter(String item, String val) {
+        String type;
+        String fixed;
+        Parameter(String item, String val,String type,String fixed) {
             this.item = item;
             this.val = val;
+            this.type = type;
+            this.fixed = fixed;
         }
 
         public String getItem() {
-            return item;
+            return this.item;
         }
 
         public void setItem(String item) {
@@ -198,11 +188,30 @@ public class ListActivity extends AppCompatActivity {
         }
 
         public String getVal() {
-            return val;
+            return this.val;
         }
 
         public void setVal(String val) {
             this.val = val;
+        }
+        public String getType() {
+            return this.type;
+        }
+
+        public void setType(String Type) {
+            this.type = type;
+        }
+        public Boolean getFixed() {
+            if (this.fixed.equals("true")){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        public void setFixed(String Type) {
+            this.type = type;
         }
     }
 }

@@ -63,6 +63,7 @@ public class SensorListAdapter extends BaseExpandableListAdapter{
 
             String childText = (String) ((Parameter)getChild(groupPosition, childPosition)).getItem();
             String childVal = (String) ((Parameter)getChild(groupPosition, childPosition)).getVal();
+            Boolean fixed = (Boolean)((Parameter)getChild(groupPosition, childPosition)).getFixed();
 
             if (convertView == null) {
                 LayoutInflater infalInflater = (LayoutInflater) this._context
@@ -75,6 +76,7 @@ public class SensorListAdapter extends BaseExpandableListAdapter{
 
             EditText txtListChildVal = (EditText) convertView
                     .findViewById(R.id.lblListItemVal);
+            txtListChildVal.setFocusable(!fixed);
 
             txtListChildItem.setText(childText);
 
