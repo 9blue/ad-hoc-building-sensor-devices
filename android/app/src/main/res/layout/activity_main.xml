@@ -20,7 +20,7 @@
             android:layout_width="fill_parent"
             android:layout_height="60dp"
             android:id="@+id/urlTextView"
-            android:hint="Enter URL"
+            android:hint="Enter Intance ID"
             android:layout_weight="0.1"/>
 
         <TextView
@@ -47,7 +47,7 @@
     <Button
         android:layout_width="fill_parent"
         android:layout_height="60dp"
-        android:text="Deploy"
+        android:text="Configure Application"
         android:id="@+id/startButton"
         android:layout_gravity="center_horizontal"
         android:layout_weight="0.10"

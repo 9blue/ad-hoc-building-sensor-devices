@@ -47,16 +47,17 @@
         android:id="@+id/sensorList"/>
 
         <Button
-            android:text="Value Confirm "
+            android:text="Update Configuration"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/confirmButton"/>
 
         <Button
-            android:text="Back "
+            android:text="Deploy"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/backButton"
+
+            android:layout_height="60dp"
+            android:id="@+id/deployButton"
             android:layout_alignParentStart="true"
             />
 

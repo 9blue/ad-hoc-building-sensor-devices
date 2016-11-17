@@ -13,6 +13,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class ListActivity extends AppCompatActivity {
     private Button backButton, confirmButton;
     private Spinner spinner;
     private HashMap<String, String> lookupTable;
-    private String configData;
+    private String configData,deviceConfig;
 
 
     @Override
@@ -43,10 +44,11 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
         typeText = (TextView) findViewById(R.id.typeView);
-        backButton = (Button) findViewById(R.id.backButton);
+        backButton = (Button) findViewById(R.id.deployButton);
         confirmButton = (Button) findViewById(R.id.confirmButton);
         spinner = (Spinner)findViewById(R.id.spinner);
         lookupTable = new HashMap<String, String>();
+        deviceConfig = "";
         lookupTableInit(lookupTable);
 
         Bundle bundle = getIntent().getExtras();
@@ -96,7 +98,8 @@ public class ListActivity extends AppCompatActivity {
                 listAdapter.notifyDataSetChanged();
 
                 Intent intent = new Intent(activity, SensorActivity.class);
-                intent.putExtra("sensorConfig", configData);
+                if(!deviceConfig.isEmpty())intent.putExtra("sensorConfig",deviceConfig );
+                else Toast.makeText(activity, "device configuration is empty", Toast.LENGTH_LONG).show();
                 // set data back to firebase
                 startActivity(intent);
             }
@@ -176,29 +179,22 @@ public class ListActivity extends AppCompatActivity {
     // update Json after threshold values are changed by users
     private void UpdateJson(String configData) {
         try {
-            //JSONObject config = new JSONObject(configData);
-            JSONObject parent = new JSONObject();
-            //JSONObject child  = new JSONObject();
-            for(HashMap.Entry<String, List<Parameter>> entry: listDataChild.entrySet()) {
-               String key = entry.getKey();
-               List<Parameter> list = listDataChild.get(key);
-               //JSONObject field = (JSONObject) config.get(key);
-                JSONObject child  = new JSONObject();
-                //System.out.println("select: " + targetSensor);
+            JSONObject default_config = new JSONObject(configData);
+               List<Parameter> list = listDataChild.get(targetSensor);
+                JSONObject chosenConfig  = (JSONObject) default_config.get(targetSensor);
                for(Parameter parameter:list) {
                    String item = parameter.getItem();
                    String val = parameter.getVal();
                    boolean fixed = parameter.getFixed();
-                   child.put(item, val);
-                   //if(!fixed)field.put(item,Integer.parseInt(val));
+                   chosenConfig.put(item, val);
                }
+            deviceConfig = chosenConfig.toString();
 
-
-           }
-        } catch (Exception e) {
-           e.printStackTrace();
+           } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
+
 
     // define new class for parameters
     public class Parameter {
