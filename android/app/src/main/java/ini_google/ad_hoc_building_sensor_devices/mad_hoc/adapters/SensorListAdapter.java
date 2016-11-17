@@ -132,6 +132,7 @@ public class SensorListAdapter extends BaseExpandableListAdapter{
 
             TextView lblListHeader = (TextView) convertView
                     .findViewById(R.id.lblListHeader);
+
             lblListHeader.setTypeface(null, Typeface.BOLD);
             lblListHeader.setTextColor(Color.BLACK);
             lblListHeader.setText(headerTitle);

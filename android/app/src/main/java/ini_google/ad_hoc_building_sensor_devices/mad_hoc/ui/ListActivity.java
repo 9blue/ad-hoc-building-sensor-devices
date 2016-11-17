@@ -5,8 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +31,9 @@ public class ListActivity extends AppCompatActivity {
     List<String> listDataHeader;
     HashMap<String, List<Parameter>> listDataChild;
     private TextView typeText;
+    private String targetSensor = null;
     private Button backButton, confirmButton;
+    private Spinner spinner;
     private HashMap<String, String> lookupTable;
     private String configData;
 
@@ -40,6 +45,7 @@ public class ListActivity extends AppCompatActivity {
         typeText = (TextView) findViewById(R.id.typeView);
         backButton = (Button) findViewById(R.id.backButton);
         confirmButton = (Button) findViewById(R.id.confirmButton);
+        spinner = (Spinner)findViewById(R.id.spinner);
         lookupTable = new HashMap<String, String>();
         lookupTableInit(lookupTable);
 
@@ -49,18 +55,29 @@ public class ListActivity extends AppCompatActivity {
         // get the listview, (ViewHolder)
         expListView = (ExpandableListView) findViewById(R.id.sensorList);
 
-        // preparing list data
-        // should prepare data first and then initialize an adapter
-        prepareListData(configData);
-        listAdapter = new SensorListAdapter(this, listDataHeader, listDataChild);
+        // set up spinner
+        ArrayList<String> listItem = new ArrayList<>();
+        getHeader(listItem, configData);
+        String[] items = listItem.toArray(new String[listItem.size()]);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
 
-        // setting list adapter, (connect ViewHolder and View)
-        expListView.setAdapter(listAdapter);
+        spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+            public void onItemSelected(AdapterView adapterView, View view, int position, long id){
+                targetSensor = adapterView.getSelectedItem().toString();
+                Toast.makeText(activity, adapterView.getSelectedItem().toString() + " is chosen", Toast.LENGTH_LONG).show();
+                // update listAdapter
+                prepareListData(configData);
+                listAdapter = new SensorListAdapter(activity, listDataHeader, listDataChild);
+                expListView.setAdapter(listAdapter);
+            }
+            public void onNothingSelected(AdapterView arg0) {
+                Toast.makeText(activity, "No sensor is selected", Toast.LENGTH_LONG).show();
+            }
+        });
 
-        // update the list
-        //listAdapter.updateData(listDataHeader, listDataChild);
-        //listAdapter.notifyDataSetChanged();
-
+        //dropdown.setSelection(((ArrayAdapter<String>)dropdown.getAdapter()).getPosition(items));
 
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,6 +104,17 @@ public class ListActivity extends AppCompatActivity {
 
     }
 
+    private void getHeader(ArrayList<String> listItem, String configData) {
+        try {
+            JSONObject config = new JSONObject(configData);
+            Iterator<?> keys = config.keys();
+            while(keys.hasNext()) {
+                listItem.add((String) keys.next());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private void prepareListData(String configData) {
         try {
@@ -100,12 +128,14 @@ public class ListActivity extends AppCompatActivity {
             Parameter parameter = null;
             List<Parameter> parameters = null;
 
-            while(keys.hasNext()) {
+//            while(keys.hasNext()) {
                 parameters = new ArrayList<Parameter>();
-                String key = (String) keys.next();
+                //String key = (String) keys.next();
+                String key = targetSensor;
                 JSONObject configSensor = (JSONObject) config.get(key);
                 parameter = null;
                 String type = configSensor.get("type").toString();
+
                 listDataHeader.add(key);
 
                 if (configSensor.has("threshold_upper")) {
@@ -124,7 +154,7 @@ public class ListActivity extends AppCompatActivity {
                     parameters.add(parameter);
                 }
                 listDataChild.put(listDataHeader.get(listDataHeader.indexOf(key)), parameters);
-            }
+//            }
 
 
 
@@ -146,19 +176,23 @@ public class ListActivity extends AppCompatActivity {
     // update Json after threshold values are changed by users
     private void UpdateJson(String configData) {
         try {
-            JSONObject config = new JSONObject(configData);
+            //JSONObject config = new JSONObject(configData);
+            JSONObject parent = new JSONObject();
+            //JSONObject child  = new JSONObject();
             for(HashMap.Entry<String, List<Parameter>> entry: listDataChild.entrySet()) {
                String key = entry.getKey();
                List<Parameter> list = listDataChild.get(key);
-               JSONObject field = (JSONObject) config.get(key);
+               //JSONObject field = (JSONObject) config.get(key);
+                JSONObject child  = new JSONObject();
+                //System.out.println("select: " + targetSensor);
                for(Parameter parameter:list) {
                    String item = parameter.getItem();
                    String val = parameter.getVal();
                    boolean fixed = parameter.getFixed();
-
-                   if(!fixed)field.put(item,Integer.parseInt(val));
-
+                   child.put(item, val);
+                   //if(!fixed)field.put(item,Integer.parseInt(val));
                }
+
 
            }
         } catch (Exception e) {
