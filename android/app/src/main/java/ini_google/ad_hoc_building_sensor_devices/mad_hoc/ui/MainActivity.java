@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     // Firebase instance variables
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     //private DatabaseReference devices = database.getReference().child("devices");
-    private DatabaseReference deviceConfig;
+    private DatabaseReference defaultConfig;
     private DatabaseReference applicationInfo;
     private DatabaseReference actuationLocation;
     private JSONObject configFromFireBase;
@@ -163,8 +163,8 @@ public class MainActivity extends AppCompatActivity {
                     //fetch application Id from firebase
                     String appID =  dataSnapshot.getValue().toString();
                     applicationInfo = database.getReference("/apps/".concat(appID));
-                    deviceConfig = applicationInfo.child("default_config");
-                    deviceConfig.addListenerForSingleValueEvent( new ValueEventListener() {
+                    defaultConfig = applicationInfo.child("default_config");
+                    defaultConfig.addListenerForSingleValueEvent( new ValueEventListener() {
 
                         public void onDataChange (DataSnapshot dataSnapshot){
                             try {
@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
                                 configFromFireBase = new JSONObject((HashMap) dataSnapshot.getValue());
                                 Intent intent = new Intent(activity, ListActivity.class);
                                 intent.putExtra("sensorConfig", configFromFireBase.toString());
+                                intent.putExtra("instanceID",instanceID);
                                 startActivity(intent);
 
 //                                Iterator<String> configParameters = configFromFireBase.keys();

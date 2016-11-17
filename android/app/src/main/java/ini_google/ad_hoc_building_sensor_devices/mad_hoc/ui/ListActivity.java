@@ -10,6 +10,9 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -31,6 +34,9 @@ public class ListActivity extends AppCompatActivity {
     private Button backButton, confirmButton;
     private HashMap<String, String> lookupTable;
     private String configData;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    //private DatabaseReference devices = database.getReference().child("devices");
+    private DatabaseReference deviceConfig;
 
 
     @Override
@@ -38,12 +44,12 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
         typeText = (TextView) findViewById(R.id.typeView);
-        backButton = (Button) findViewById(R.id.backButton);
+        backButton = (Button) findViewById(R.id.deployButton);
         confirmButton = (Button) findViewById(R.id.confirmButton);
         lookupTable = new HashMap<String, String>();
         lookupTableInit(lookupTable);
 
-        Bundle bundle = getIntent().getExtras();
+        final Bundle bundle = getIntent().getExtras();
         configData =  (String) bundle.get("sensorConfig");
 
         // get the listview, (ViewHolder)
@@ -80,6 +86,7 @@ public class ListActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(activity, SensorActivity.class);
                 intent.putExtra("sensorConfig", configData);
+                intent.putExtra("instanceID",bundle.get("instanceID").toString());
                 // set data back to firebase
                 startActivity(intent);
             }
@@ -160,7 +167,10 @@ public class ListActivity extends AppCompatActivity {
 
                }
 
+
            }
+            this.configData = config.toString();
+            deviceConfig = database.getReference("/devices");
         } catch (Exception e) {
            e.printStackTrace();
         }
