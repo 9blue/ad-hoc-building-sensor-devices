@@ -51,7 +51,7 @@ public class ListActivity extends AppCompatActivity {
         deviceConfig = "";
         lookupTableInit(lookupTable);
 
-        Bundle bundle = getIntent().getExtras();
+        final Bundle bundle = getIntent().getExtras();
         configData =  (String) bundle.get("sensorConfig");
 
         // get the listview, (ViewHolder)
@@ -99,7 +99,9 @@ public class ListActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(activity, SensorActivity.class);
                 if(!deviceConfig.isEmpty())intent.putExtra("sensorConfig",deviceConfig );
+
                 else Toast.makeText(activity, "device configuration is empty", Toast.LENGTH_LONG).show();
+                intent.putExtra("instanceID",bundle.get("instanceID").toString());
                 // set data back to firebase
                 startActivity(intent);
             }
@@ -188,7 +190,9 @@ public class ListActivity extends AppCompatActivity {
                    boolean fixed = parameter.getFixed();
                    chosenConfig.put(item, val);
                }
-            deviceConfig = chosenConfig.toString();
+            default_config = new JSONObject();
+            default_config.put(targetSensor,chosenConfig);
+            deviceConfig = default_config.toString();
 
            } catch (JSONException e) {
             e.printStackTrace();
