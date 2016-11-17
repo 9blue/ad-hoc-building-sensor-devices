@@ -22,13 +22,6 @@
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="60dp"
-            android:text="Status"
-            android:id="@+id/statusView"
-            android:textSize="24sp"/>
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="60dp"
             android:text="task"
             android:id="@+id/taskView"
             android:layout_below="@+id/linearLayout"
@@ -43,27 +36,12 @@
             android:textSize="24dp"
             android:gravity="center"/>
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-
-            <Button
-                android:text="Actuators"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/actuatorList"
-                android:layout_weight="1"/>
-
-            <Button
-                android:text="Sensors"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/sensorList"
-                android:layout_weight="1"/>
-
-        </LinearLayout>
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:text="Value"
+            android:id="@+id/valueView"
+            android:textSize="24sp"/>
 
         <TextView
             android:text="Description"

@@ -22,7 +22,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:text="Sensors"
+                android:text="Configuration Sensors"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/typeView"
@@ -47,17 +47,16 @@
         android:id="@+id/sensorList"/>
 
         <Button
-            android:text="Update Configuration"
+            android:text="Value Confirm "
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/confirmButton"/>
 
         <Button
-            android:text="Deploy"
+            android:text="Back "
             android:layout_width="match_parent"
-
-            android:layout_height="60dp"
-            android:id="@+id/deployButton"
+            android:layout_height="wrap_content"
+            android:id="@+id/backButton"
             android:layout_alignParentStart="true"
             />
 
