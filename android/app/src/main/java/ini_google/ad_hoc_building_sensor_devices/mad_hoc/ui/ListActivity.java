@@ -33,7 +33,7 @@ public class ListActivity extends AppCompatActivity {
     HashMap<String, List<Parameter>> listDataChild;
     private TextView typeText;
     private String targetSensor = null;
-    private Button backButton, confirmButton;
+    private Button deployButton, confirmButton;
     private Spinner spinner;
     private HashMap<String, String> lookupTable;
     private String configData,deviceConfig;
@@ -44,7 +44,7 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
         typeText = (TextView) findViewById(R.id.typeView);
-        backButton = (Button) findViewById(R.id.deployButton);
+        deployButton = (Button) findViewById(R.id.deployButton);
         confirmButton = (Button) findViewById(R.id.confirmButton);
         spinner = (Spinner)findViewById(R.id.spinner);
         lookupTable = new HashMap<String, String>();
@@ -91,7 +91,7 @@ public class ListActivity extends AppCompatActivity {
             }
         });
 
-        backButton.setOnClickListener(new View.OnClickListener() {
+        deployButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listAdapter.updateList(listDataHeader, listDataChild);
