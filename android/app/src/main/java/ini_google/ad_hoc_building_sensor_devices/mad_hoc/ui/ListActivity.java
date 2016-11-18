@@ -13,6 +13,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,19 +37,20 @@ public class ListActivity extends AppCompatActivity {
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<Parameter>> listDataChild;
-    private TextView typeText;
+    private TextView AppName;
     private String targetSensor = null;
     private Button deployButton, confirmButton;
     private Spinner spinner;
     private HashMap<String, String> lookupTable;
     private String configData,deviceConfig;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
-        typeText = (TextView) findViewById(R.id.typeView);
+        AppName = (TextView) findViewById(R.id.appView);
         deployButton = (Button) findViewById(R.id.deployButton);
         confirmButton = (Button) findViewById(R.id.confirmButton);
         spinner = (Spinner)findViewById(R.id.spinner);
@@ -57,6 +64,7 @@ public class ListActivity extends AppCompatActivity {
         // get the listview, (ViewHolder)
         expListView = (ExpandableListView) findViewById(R.id.sensorList);
 
+        setAppNamefromInstanceID(bundle.get("instanceID").toString());
         // set up spinner
         ArrayList<String> listItem = new ArrayList<>();
         getHeader(listItem, configData);
@@ -199,8 +207,43 @@ public class ListActivity extends AppCompatActivity {
         }
     }
 
+    private void setAppNamefromInstanceID(String instanceID) {
+        DatabaseReference applicaton = database.getReference("app_ids").child(instanceID);
+        applicaton.addListenerForSingleValueEvent( new ValueEventListener() {
 
-    // define new class for parameters
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                try {
+                    String app_id = dataSnapshot.getValue().toString();
+                    DatabaseReference applicationName = database.getReference("apps").child(app_id).child("app_name");
+                    applicationName.addListenerForSingleValueEvent( new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            try{
+                                String app_name = dataSnapshot.getValue().toString();
+                                if(!app_name.isEmpty())AppName.setText(app_name);
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+            // define new class for parameters
     public class Parameter {
         String item;
         String val;
@@ -250,4 +293,7 @@ public class ListActivity extends AppCompatActivity {
             this.fixed = fixed;
         }
     }
+
+
+
 }

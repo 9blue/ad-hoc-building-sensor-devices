@@ -50,7 +50,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     private JSONObject deviceConfig;
     private CameraManager mCameraManager;
     private static String device_id;
-    private TextView statusView, sensorValue,taskView;
+    private TextView configView,sensorType ,sensorValue,taskView;
     private Button sensorListButton, actuatorButton, cancelButton;
     private SensorManager mSensorManager;
     private Sensor mSensor;
@@ -64,8 +64,9 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
         taskView = (TextView) findViewById(R.id.taskView);
         cancelButton = (Button) findViewById(R.id.cancelbutton);
-        taskView = (TextView) findViewById(R.id.taskView);
         sensorValue = (TextView) findViewById(R.id.valueView);
+        sensorType = (TextView) findViewById(R.id.sensorType);
+        configView = (TextView) findViewById(R.id.configuration);
         Bundle bundle = getIntent().getExtras();
 
         androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -131,6 +132,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
     private void configureActuators(String parameter, String parameterType){
         actuators = database.getReference("install_actuators").child(instanceID).child(parameter).child(device_id);
+        configView.setText(deviceConfig.toString());
         setAppNamefromInstanceID(instanceID);
         actuators.setValue("connected");
         actuators.addValueEventListener(new ValueEventListener() {
@@ -195,7 +197,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     private void deployDevicewithConfig(String instanceID, JSONObject deviceConfig) {
         Gson gson = new Gson();
         Map<String, Object> configuration = gson.fromJson(deviceConfig.toString(), Map.class );
-
+        configView.setText(deviceConfig.toString());
         devices.child(instanceID).child(androidID).child("config").updateChildren(configuration);
         Toast.makeText(activity, "Configuration Deployed Successfully", Toast.LENGTH_LONG).show();
     }
@@ -206,6 +208,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             sensors = database.getReference("install_sensors").child(this.instanceID).child(parameter).child(device_id);
 
             setAppNamefromInstanceID(this.instanceID);
+            sensorType.setText(parameterType);
 
             if(parameterType.equals("LIGHT")) {
                 mSensor = mSensorManager.getDefaultSensor(5);

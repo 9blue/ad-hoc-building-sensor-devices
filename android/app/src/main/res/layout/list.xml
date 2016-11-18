@@ -17,23 +17,30 @@
                   android:layout_height="wrap_content">
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <TextView
-                android:text="Configuration Sensors"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/typeView"
-                android:textSize="24sp"
-                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:id="@+id/appView"
+                android:textSize="18sp"
                 android:textStyle="normal|bold"
                 android:fontFamily="sans-serif"/>
 
+            <TextView
+                android:text="Choose Configuration"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:id="@+id/textView2"
+                android:textSize="18sp"
+                android:textStyle="normal|bold"
+                android:fontFamily="sans-serif" />
+
             <Spinner
                 android:id="@+id/spinner"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:drawable/btn_dropdown"
                 android:spinnerMode="dropdown"
@@ -43,7 +50,7 @@
 
         <ExpandableListView
         android:layout_width="fill_parent"
-        android:layout_height="327dp"
+        android:layout_height="243dp"
         android:id="@+id/sensorList"/>
 
         <Button
@@ -55,7 +62,7 @@
         <Button
             android:text="Deploy Application"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="54dp"
             android:id="@+id/deployButton"
             android:layout_alignParentStart="true"
             />

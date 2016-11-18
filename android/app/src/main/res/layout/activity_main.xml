@@ -44,7 +44,7 @@
 
     </LinearLayout>
 
-    <Button
+    <!--<Button
         android:layout_width="fill_parent"
         android:layout_height="60dp"
         android:text="Configure Application"
@@ -55,5 +55,5 @@
         android:layout_centerHorizontal="true"
         android:textSize="20sp"
         android:textStyle="normal"
-        />
+        />-->
 </RelativeLayout>

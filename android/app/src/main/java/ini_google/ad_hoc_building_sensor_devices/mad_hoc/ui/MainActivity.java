@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         //connectedList = (TextView) findViewById(R.id.connectedList);
         urlTextView = (EditText) findViewById(R.id.urlTextView);
         scanButton = (Button) findViewById(R.id.scanButton);
-        startButton = (Button) findViewById(R.id.startButton);
+        //startButton = (Button) findViewById(R.id.startButton);
         instanceID = "";
         mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         configData = "";
@@ -114,14 +114,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        startButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(activity, ListActivity.class);
-                intent.putExtra("configData", configData);
-                startActivity(intent);
-
-            }
-        });
+//        startButton.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                Intent intent = new Intent(activity, ListActivity.class);
+//                intent.putExtra("configData", configData);
+//                startActivity(intent);
+//
+//            }
+//        });
     }
 
     // QR code
