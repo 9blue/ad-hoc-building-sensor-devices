@@ -134,7 +134,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         actuators = database.getReference("install_actuators").child(instanceID).child(parameter).child(device_id);
         configView.setText(deviceConfig.toString());
         setAppNamefromInstanceID(instanceID);
-        actuators.setValue("connected");
+        actuators.setValue(false);
         actuators.addValueEventListener(new ValueEventListener() {
 
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -209,6 +209,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
             setAppNamefromInstanceID(this.instanceID);
             sensorType.setText(parameterType);
+
+            sensors.setValue(true);
 
             if(parameterType.equals("LIGHT")) {
                 mSensor = mSensorManager.getDefaultSensor(5);
