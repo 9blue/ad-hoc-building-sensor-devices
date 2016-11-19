@@ -72,11 +72,11 @@
         }];
 
         ss.getActuators = function() {
-            return acturator_list;
+            return angular.copy(acturator_list);
         };
 
         ss.getSensors = function() {
-            return sensor_list;
+            return angular.copy(sensor_list);
         };
     }
 })();
