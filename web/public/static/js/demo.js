@@ -8,14 +8,17 @@
         vm.text = 'Firebase rulez!';
 
         var dbRef = firebase.database().ref();
-        var appid = "-JglJnGDXcqLq6m844pZ";
+        var appid = "-KWtggWikwCYiCoViZE1";
         vm.app_config = null;
         var instances = null;
         var appRef = dbRef.child('apps').child(appid);
+        var install_sensors = dbRef.child('install_sensors');
+        var install_actuators = dbRef.child('install_actuators');
+        var ACTIVATION_VAL = 200;
 
-        // var devicesRef = dbRef.child('devices');
-        var sDataRef = dbRef.child('sensor_data');
-        var aDataRef = dbRef.child('actuator_data');
+
+
+
         vm.light_reading = null;
         vm.flash_on = null;
 
@@ -24,29 +27,36 @@
             instances = _.keys(vm.app_config.instances);
         });
 
-        appRef.child('devices').on('child_added', function(data) {
+        var app_idsRef = dbRef.child('app_ids');
+
+        app_idsRef.orderByValue().equalTo(appid).on('child_added', function(data) {
+            console.log('new_instance', data.key);
             var new_instance = data.key;
-            var sRef = sDataRef.child(new_instance);
-            var aRef = aDataRef.child(new_instance);
+
+            var install_sensorRef = install_sensors.child(new_instance);
+            var install_actuatorRef = install_actuators.child(new_instance);
             var actuator = null;
-            aRef.child('flash').once("value").then(function(snapshot) {
+            install_actuatorRef.child('flash1').once("value").then(function(snapshot) {
                 actuator = _.keys(snapshot.val())[0];
+                console.log('flash1', actuator);
             });
-            sRef.child('light').on('value', function(snapshot) {
+
+            install_sensorRef.child('light1').on('value', function(snapshot) {
                 $timeout(function() {
                     var device_id = _.keys(snapshot.val())[0];
-                    vm.light_reading = _.map(_.keys(snapshot.val()), function(x){
+                    vm.light_reading = _.map(_.keys(snapshot.val()), function(x) {
                         return snapshot.val()[x];
                     });
+                    vm.light_reading = vm.light_reading[0].value;
                     console.log(vm.light_reading);
-                    var flash = _.some(vm.light_reading, function(x){ return x < 100;});
+                    var flash = vm.light_reading < ACTIVATION_VAL;
                     console.log(flash);
-                    if(flash){
+                    if (flash) {
                         vm.flash_on = true;
-                        aRef.child('flash').child(actuator).set(true);
+                        install_actuatorRef.child('flash1').child(actuator).set(true);
                     } else {
                         vm.flash_on = false;
-                        aRef.child('flash').child(actuator).set(false);
+                        install_actuatorRef.child('flash1').child(actuator).set(false);
                     }
                 }, 0);
             });

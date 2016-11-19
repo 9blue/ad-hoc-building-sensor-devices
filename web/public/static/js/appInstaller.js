@@ -11,6 +11,8 @@
         //vm.apps = ['app1', 'app2', 'app3']; // Retrieve that from firebase
         vm.apps = [];
 
+
+
         appsRef.once('value').then(function(snapshot) {
             $timeout(function() {
                 vm.apps = snapshot.val();
@@ -20,6 +22,15 @@
                 }
             }, 0);
         });
+
+
+        lookUp.orderByValue().equalTo(vm.selected_id).on('child_added', function(snapshot) {
+            console.log(snapshot.key);
+            $timeout(function() {
+                vm.all_installs.append(snapshot.key);
+            }, 0);
+        });
+
 
 
         vm.showDetail = function(id) {

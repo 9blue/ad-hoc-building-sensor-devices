@@ -34,12 +34,6 @@
         //     templateUrl: '/template/app_view.html',
         //     controller: 'appViewController',
         //     controllerAs: 'av'
-        .state('create_project', {
-            url: '/create_project',
-            templateUrl: '/template/config.html',
-            controller: 'createProjController',
-            controllerAs: 'cp'
-        })
 
         .state('demo', {
             url: '/demo',
