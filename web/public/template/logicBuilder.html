@@ -23,21 +23,23 @@
             </div>
             <div class="form-group">
                 <label>Sensors</label>
-                <div ng-repeat = "st in lb.sensor_types">
-                    <div ng-repeat="t in lb.added_sensors | filter:{name:st} track by $index" ng-include="t.tpl_url">        
-                    </div>
+                <div>
+                    <div ng-repeat="t in lb.added_sensors track by $index" ng-include="t.tpl_url"></div>
                 </div>
-                <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label group by s.type for s in lb.sensor_list" ng-model="lb.new_sensor"></select>
-                <button type="button" ng-click="lb.addSensor()" class="btn btn-default">Add Sensor</button>
+                <div ng-if="lb.added_sensors.length < 3">
+                    <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label disable when s.disable for s in lb.sensor_list" ng-model="lb.new_sensor"></select>
+                    <button type="button" ng-disabled="!lb.new_sensor" ng-click="lb.addSensor()" class="btn btn-default">Add Sensor</button>
+                </div>
             </div>
             <div class="form-group">
                 <label>Actuators</label>
-                <div ng-repeat = "at in lb.actuator_types">
-                    <div ng-repeat="t in lb.added_actuators | filter:{name:at} track by $index" ng-include="t.tpl_url">        
-                    </div>
+                <div>
+                    <div ng-repeat="t in lb.added_actuators track by $index" ng-include="t.tpl_url"></div>
                 </div>
-                <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label for s in lb.actuator_list" ng-model="lb.new_actuator"></select>
-                <button type="button" ng-click="lb.addActuator()" class="btn btn-default">Add Actuator</button>
+                <div ng-if="lb.added_actuators.length < 3">
+                    <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label disable when s.disable for s in lb.actuator_list" ng-model="lb.new_actuator"></select>
+                    <button type="button" ng-disabled="!lb.new_actuator" ng-click="lb.addActuator()" class="btn btn-default">Add Actuator</button>
+                </div>
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-default">Publish</button>

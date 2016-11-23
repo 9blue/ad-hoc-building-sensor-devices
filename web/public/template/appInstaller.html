@@ -4,19 +4,28 @@
             <div class="row">
                 <div class="col-md-8">
                     <!-- Add application details here -->
-                    <h4> {{ai.selected_app.app_name}} </h4>
-                    App Owner: {{ai.selected_app.owner}}
-                    <br/>
-                    App Details: {{ai.selected_app.desc}}
-                    <br/>
-                    Contact: {{ai.selected_app.email}}
-<!--                     <ul>
-                        Current installs:
-                        <li ng-repeat="v in ai.all_installs">{{v}}</li>
-                    </ul> -->
+                    <h4> {{ai.selected_app.app_name}} </h4> App Owner: {{ai.selected_app.owner}}
+                    <br/> App Details: {{ai.selected_app.desc}}
+                    <br/> Contact: {{ai.selected_app.email}}
+                    <br/> Parts: {{ai.selected_app.components}}
+                    <div>
+                        Current instances
+                        <div class="list-group">
+                            <div ng-repeat="v in ai.all_installs">
+                                <button data-toggle="collapse" data-target="#{{v.id}}" aria-expanded="false" class="list-group-item">{{v.name}}</button>
+                                <div class="collapse" id="{{v.id}}">
+                                    <div class="well">
+                                        This is {{v.name}}<br/>
+                                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#install_modal" ng-click="ai.openModal(v)">QR Code</button>
+                                        <button class="btn btn-danger btn-sm pull-right" ng-click="ai.removeInstall(v.id)">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-4">
-                    <button class="btn btn-success" data-toggle="modal" data-target="#install_app" ng-click="ai.installApp()">Install</button>
+                    <button class="btn btn-success" data-toggle="modal" data-target="#install_modal" ng-click="ai.openModal()">Install</button>
                 </div>
             </div>
         </div>
@@ -27,12 +36,12 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="install_app" tabindex="-1" role="dialog" data-backdrop="static">
+<div class="modal fade" id="install_modal" tabindex="-1" role="dialog" data-backdrop="static">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">Install {{ai.selected_app.app_name}}</h4>
+                <h4 class="modal-title">{{ai.modal_title}}</h4>
             </div>
             <div class="modal-body">
                 <div ng-if="ai.inst_hash">
@@ -44,7 +53,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="submit" form="new_app" class="btn btn-primary">Install Application</button>
+                <!-- <button type="submit" form="new_app" class="btn btn-primary">Install Application</button> -->
             </div>
         </div>
     </div>

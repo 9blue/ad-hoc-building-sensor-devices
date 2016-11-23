@@ -4,23 +4,79 @@
 
     function sensorService($stateParams) {
         var ss = this;
-        var sensor_list = [
-            { name: 'light', label: 'Light Sensor', type: 'stream', tpl_url: '/template/sensors_tpl/light.html' },
-            { name: 'sound', label: 'Sound Sensor', type: 'stream', tpl_url: '/template/sensors_tpl/sound.html' },
-            // { name: 'camera', label: 'Camera', type: 'dark', tpl_url: '/template/sensors_tpl/camera.html' },
-        ];
+        var sensor_list = [{
+            name: 'light',
+            label: 'Light Sensor',
+            disable: false,
+            tpl_url: '/template/sensors_tpl/light.html',
+            config: {
+                type: 'LIGHT',
+                desc: '',
+                sampling_rate: 10,
+                threshold_lower: true,
+                threshold_upper: true
+            }
+        }, {
+            name: 'accelerator',
+            label: 'Accelerator',
+            disable: false,
+            tpl_url: '/template/sensors_tpl/accelerator.html',
+            config: {
+                type: 'ACCELERATOR',
+                desc: '',
+                sampling_rate: 20,
+                threshold_lower: true,
+                threshold_upper: true
+            }
+        }, {
+            name: 'camera',
+            label: 'Camera',
+            disable: false,
+            tpl_url: '/template/sensors_tpl/camera.html',
+            config: {
+                type: 'CAMERA',
+                desc: '',
+                sampling_rate: 30,
+                threshold_lower: true,
+                threshold_upper: true
+            }
+        }];
 
-        var acturator_list = [
-            { name: 'flash', label: 'Flash', tpl_url: '/template/acturator_tpl/flash.html' },
-            { name: 'screen_light', label: 'Screen Light', tpl_url: '/template/acturator_tpl/screen_light.html' }
-        ];
+        var acturator_list = [{
+            name: 'flash',
+            label: 'Flash',
+            disable: false,
+            tpl_url: '/template/acturator_tpl/flash.html',
+            config: {
+                type: 'FLASH',
+                desc: ''
+            }
+        }, {
+            name: 'screen',
+            label: 'Screen',
+            disable: false,
+            tpl_url: '/template/acturator_tpl/screen.html',
+            config: {
+                type: 'SCREEN',
+                desc: ''
+            }
+        }, {
+            name: 'speaker',
+            label: 'Speaker',
+            disable: false,
+            tpl_url: '/template/acturator_tpl/speaker.html',
+            config: {
+                type: 'SPEAKER',
+                desc: ''
+            }
+        }];
 
         ss.getActuators = function() {
-            return acturator_list;
+            return angular.copy(acturator_list);
         };
 
         ss.getSensors = function() {
-            return sensor_list; 
+            return angular.copy(sensor_list);
         };
     }
 })();
