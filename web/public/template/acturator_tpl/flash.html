@@ -1,9 +1,9 @@
-<label>Acturator</label>
+<label>Flash Light {{$index + 1}}</label>
 <div class="row">
     <div class="col-md-12">
         <div class="form-group">
-            <label>URL:(Needs to be removed or replaced with different input value) </label>
-            <input type="text" class="form-control" ng-model="lb.new_app.default_config.flash.url" required="required">
+            <label>Type:</label>
+            <input type="text" class="form-control" ng-model="lb.new_app.default_config['flash'+($index+1)]['type']" required="required">
         </div>
     </div>
 </div>

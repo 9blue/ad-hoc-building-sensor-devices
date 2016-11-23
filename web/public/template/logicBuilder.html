@@ -22,6 +22,7 @@
                 <textarea type="text" class="form-control" ng-model="lb.new_app.desc" placeholder="Application Description" required="required"></textarea>
             </div>
             <div class="form-group">
+                <label>Sensors</label>
                 <div ng-repeat = "st in lb.sensor_types">
                     <div ng-repeat="t in lb.added_sensors | filter:{name:st} track by $index" ng-include="t.tpl_url">        
                     </div>
@@ -30,11 +31,16 @@
                 <button type="button" ng-click="lb.addSensor()" class="btn btn-default">Add Sensor</button>
             </div>
             <div class="form-group">
-                <div ng-include="lb.added_acturator"></div>
-                <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label for s in lb.acturator_list" ng-change="lb.addActurator()" ng-model="lb.new_acturator"></select>
+                <label>Actuators</label>
+                <div ng-repeat = "at in lb.actuator_types">
+                    <div ng-repeat="t in lb.added_actuators | filter:{name:at} track by $index" ng-include="t.tpl_url">        
+                    </div>
+                </div>
+                <select class="form-control" style="display: inline-block; width: 50%" ng-options="s.label for s in lb.actuator_list" ng-model="lb.new_actuator"></select>
+                <button type="button" ng-click="lb.addActuator()" class="btn btn-default">Add Actuator</button>
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-default">Create Application</button>
+                <button type="submit" class="btn btn-default">Publish</button>
             </div>
         </form>
     </div>

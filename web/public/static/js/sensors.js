@@ -11,15 +11,16 @@
         ];
 
         var acturator_list = [
-            { name: 'flash', label: 'Flash', tpl_url: '/template/acturator_tpl/flash.html' }
-            // { name: 'screen_light', label: 'Screen Light', tpl_url: '/template/acturator_tpl/camera.html' }
+            { name: 'flash', label: 'Flash', tpl_url: '/template/acturator_tpl/flash.html' },
+            { name: 'screen_light', label: 'Screen Light', tpl_url: '/template/acturator_tpl/screen_light.html' }
         ];
 
-        ss.getActurators = function() {
+        ss.getActuators = function() {
             return acturator_list;
         };
 
         ss.getSensors = function() {
-            return sensor_list; };
+            return sensor_list; 
+        };
     }
 })();
