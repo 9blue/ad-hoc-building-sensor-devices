@@ -13,14 +13,13 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:weightSum="1"
-        android:layout_above="@+id/startButton">
+        android:weightSum="1">
 
         <EditText
             android:layout_width="fill_parent"
             android:layout_height="60dp"
             android:id="@+id/urlTextView"
-            +android:hint="Enter Intance ID"
+            android:hint="Enter Intance ID"
             android:layout_weight="0.1"/>
 
         <TextView

@@ -3,6 +3,10 @@ package ini_google.ad_hoc_building_sensor_devices.mad_hoc.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -43,20 +47,17 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference devices;
-    private DatabaseReference deviceConfigRef;
     private DatabaseReference sensors,actuators;
-    private ValueEventListener deviceListListener;
-
     private JSONObject deviceConfig;
     private CameraManager mCameraManager;
     private static String device_id;
     private TextView configView,sensorType ,sensorValue,taskView;
-    private Button sensorListButton, actuatorButton, cancelButton;
+    private Button cancelButton;
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private int lowerThreshold,upperThreshold;
     private String instanceID ;
-
+    private String type;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +73,6 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = null;
 
         try {
@@ -94,31 +94,25 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 int role = getResources().getIdentifier(parameterType, "String", getPackageName());
                 if (parameterType.equals("LIGHT")) {
                     configureSensors(parameter,parameterType);
-                } else if (parameterType.equals("FLASH")) {
+                    this.type = parameterType;
+                }
+                if (parameterType.equals("ACCELEROMETER")){
+                    configureSensors(parameter,parameterType);
+                    this.type = parameterType;
+                }
+                if (parameterType.equals("FLASH")) {
                     configureActuators(parameter,parameterType);
+                    this.type = parameterType;
+                }
+                if (parameterType.equals("SCREEN")) {
+                    configureActuators(parameter,parameterType);
+                    this.type = parameterType;
                 }
             }
             
         } catch (Exception e) {
             e.printStackTrace();
         }
-//
-//        sensorListButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(activity, ListActivity.class);
-//                startActivity(intent);
-//            }
-//        });
-//
-//        actuatorButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(activity, ListActivity.class);
-//                startActivity(intent);
-//            }
-//        });
-
 
         cancelButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
@@ -134,26 +128,33 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         actuators = database.getReference("install_actuators").child(instanceID).child(parameter).child(device_id);
         configView.setText(deviceConfig.toString());
         setAppNamefromInstanceID(instanceID);
-        actuators.setValue(false);
-        actuators.addValueEventListener(new ValueEventListener() {
+        if(this.type.equals("FLASH")) {
+            actuators.setValue(false);
+            actuators.addValueEventListener(new ValueEventListener() {
 
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String flashON = dataSnapshot.getValue().toString();
-                if(flashON.equals("true")){
-                    turnOnFlashLight();
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String flashON = dataSnapshot.getValue().toString();
+                    if (flashON.equals("true")) {
+                        turnOnFlashLight();
+                    } else {
+                        turnOffFlashLight();
+                    }
                 }
-                else {
-                    turnOffFlashLight();
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    System.out.println(databaseError.toString());
                 }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println(databaseError.toString());
-            }
-        });
-
+            });
+        }
+        if(this.type.equals("SCREEN"))
+        {
+            Bitmap b = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(b);
+            c.drawRGB(50,50,50);
+        }
     }
+
     private void turnOnFlashLight() {
         //here to judge if flash is available
         try{
@@ -174,6 +175,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             e.printStackTrace();
         }
     }
+
     private void turnOffFlashLight() {
         try{
             CameraCharacteristics cameraCharacteristics = mCameraManager.getCameraCharacteristics("0");
@@ -214,6 +216,10 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
             if(parameterType.equals("LIGHT")) {
                 mSensor = mSensorManager.getDefaultSensor(5);
+            }
+            if(parameterType.equals("ACCELEROMETER")){
+                //vrushali part
+                mSensor = mSensorManager.getDefaultSensor(1);
             }
             else{
                 sensorValue.setText("Sensor not supported");
@@ -274,27 +280,21 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         });
     }
 
-//    public void onSensorChanged(SensorEvent event) {
-//        float lux = event.values[0];
-//        TextView textView = (TextView)findViewById(R.id.textView);
-//        textView.setTextSize(40);
-//        textView.setText(Float.toString(lux));
-//        if(lux>triggerPoint)
-//        {
-//            appDataStore.child(androidID).child(Long.toString(new Date().getTime())).setValue(Float.toString(lux));
-//        }
-//    }
-
-
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float sensor_value = event.values[0];
-        sensorValue.setText(Float.toString(sensor_value));
+        if(this.type.equals("LIGHT")){
+            float sensor_value = event.values[0];
+            sensorValue.setText(Float.toString(sensor_value));
 
-        if(sensor_value<upperThreshold && sensor_value>lowerThreshold)
-        {
-            sensors.child("value").setValue(Float.toString(sensor_value));
-            sensors.child("last_modified").setValue(Long.toString(new Date().getTime()));
+            if(sensor_value<upperThreshold && sensor_value>lowerThreshold)
+            {
+                sensors.child("value").setValue(Float.toString(sensor_value));
+                sensors.child("last_modified").setValue(Long.toString(new Date().getTime()));
+            }
+        }
+        if(this.type.equals("ACCELEROMETER")){
+            //vrushali dot the accelerometer logic here..use the above two lines to update the values in firebase
+
         }
     }
 
@@ -303,6 +303,5 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
 
     }
-
 
 }

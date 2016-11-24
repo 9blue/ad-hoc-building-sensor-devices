@@ -36,9 +36,7 @@ import ini_google.ad_hoc_building_sensor_devices.R;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-//    private static final String firebabeURL = "https://ad-hoc-building-sensor-devices.firbaseio.com/";
-//    private SensorManager mSensorManager;
-//    private Sensor mSensor;
+
     private final Activity activity = this;
     private static String androidID;
     private Button scanButton, startButton;
@@ -48,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     private static String device_hash;
     private int triggerPoint = 0;
 
-    // Firebase instance variables
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     //private DatabaseReference devices = database.getReference().child("devices");
     private DatabaseReference defaultConfig;
@@ -76,11 +73,6 @@ public class MainActivity extends AppCompatActivity {
         mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         configData = "";
 
-        //scanButton.setTransformationMethod(null);
-
-        /**
-         * Start scanning function with zxing library
-         */
         urlTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -113,15 +105,6 @@ public class MainActivity extends AppCompatActivity {
                 intentIntegrator.initiateScan();
             }
         });
-
-//        startButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//                Intent intent = new Intent(activity, ListActivity.class);
-//                intent.putExtra("configData", configData);
-//                startActivity(intent);
-//
-//            }
-//        });
     }
 
     // QR code
@@ -144,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
                 if(!instanceID.isEmpty()) {
                     downloadDefaultConfig();
                 }
-                //searchOnInternet(result.getContents());
             }
         } else {
             //empty
@@ -157,38 +139,24 @@ public class MainActivity extends AppCompatActivity {
         applicationInfo = database.getReference("/app_ids");
         //fetch reference of Instance
         DatabaseReference instanceInfo = applicationInfo.child(instanceID);
-        instanceInfo.addListenerForSingleValueEvent( new ValueEventListener() {
-            public void onDataChange (DataSnapshot dataSnapshot){
+        instanceInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 try {
                     //fetch application Id from firebase
-                    String appID =  dataSnapshot.getValue().toString();
+                    JSONObject appInfo = new JSONObject((HashMap) dataSnapshot.getValue());
+                    String appID = appInfo.get("app_id").toString();
                     applicationInfo = database.getReference("/apps/".concat(appID));
                     defaultConfig = applicationInfo.child("default_config");
-                    defaultConfig.addListenerForSingleValueEvent( new ValueEventListener() {
+                    defaultConfig.addListenerForSingleValueEvent(new ValueEventListener() {
 
-                        public void onDataChange (DataSnapshot dataSnapshot){
+                        public void onDataChange(DataSnapshot dataSnapshot) {
                             try {
                                 //default config for the app from firebase
                                 configFromFireBase = new JSONObject((HashMap) dataSnapshot.getValue());
                                 Intent intent = new Intent(activity, ListActivity.class);
                                 intent.putExtra("sensorConfig", configFromFireBase.toString());
-                                intent.putExtra("instanceID",instanceID);
+                                intent.putExtra("instanceID", instanceID);
                                 startActivity(intent);
-
-//                                Iterator<String> configParameters = configFromFireBase.keys();
-//                                while (configParameters.hasNext()) {
-//                                    String configParameter = configParameters.next();
-//                                    JSONObject default_config = new JSONObject(configFromFireBase.get(configParameter).toString());
-//                                    configData = default_config.toString();
-//                                    System.out.println("configData: " + configData);
-////                        if (default_config.get("type").toString().equals("LIGHT")) {
-//                            textView.setText(default_config.toString());
-//                            Intent intent = new Intent(activity, SensorActivity.class);
-//                            intent.putExtra("sensorConfig", default_config.toString());
-//                            startActivity(intent);
-//                        } else if (default_config.get("type").toString().equals("FLASH")) {
-//                            setupActuation(default_config);
-//                        }
 
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -200,82 +168,15 @@ public class MainActivity extends AppCompatActivity {
                             Log.w(TAG, "getUser:onCancelled", databaseError.toException());
                         }
                     });
-                    }
-                catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-                }
+            }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
-
-
     }
-
-    /**
-     * Fetch URL
-     */
-
-    private void setupActuation(JSONObject config){
-        try {
-            actuationLocation = database.getReferenceFromUrl(config.get("data_store").toString()).child(androidID);
-            actuationLocation.addValueEventListener(new ValueEventListener() {
-
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    String flashON = dataSnapshot.getValue().toString();
-                    if(flashON.equals("true")){
-                        turnOnFlashLight();
-                    }
-                    else {
-                        turnOffFlashLight();
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                        System.out.println(databaseError.toString());
-                }
-            });
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
-    private void turnOnFlashLight() {
-        //here to judge if flash is available
-        try{
-            CameraCharacteristics cameraCharacteristics = mCameraManager.getCameraCharacteristics("0");
-            boolean flashAvailable = cameraCharacteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
-            if (flashAvailable) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    mCameraManager.setTorchMode("0",true);
-                }
-
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    private void turnOffFlashLight() {
-        try{
-            CameraCharacteristics cameraCharacteristics = mCameraManager.getCameraCharacteristics("0");
-            boolean flashAvailable = cameraCharacteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
-            if (flashAvailable) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    mCameraManager.setTorchMode("0",false);
-                    textView.setText("Flash Off");
-                }
-
-            }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
 }
