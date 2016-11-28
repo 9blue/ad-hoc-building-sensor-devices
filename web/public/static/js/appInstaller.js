@@ -40,8 +40,8 @@
                     name: name
                 });
             });
-
         }
+
         getAppsPromise().then(function(data) {
             vm.apps = data.val();
             angular.forEach(vm.apps, function(app){
