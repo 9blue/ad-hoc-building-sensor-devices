@@ -8,6 +8,7 @@
         var appsRef = dbRef.child('apps');
         var lookUp = dbRef.child('app_ids');
 
+        vm.showEdit = true;
         vm.apps = [];
 
         function getAppsPromise() {
@@ -44,7 +45,7 @@
 
         getAppsPromise().then(function(data) {
             vm.apps = data.val();
-            angular.forEach(vm.apps, function(app){
+            angular.forEach(vm.apps, function(app) {
                 app.components = _.keys(app.default_config);
             });
             console.log(vm.apps);
@@ -54,8 +55,6 @@
             }
             updateInstalls();
         });
-
-
 
         vm.showDetail = function(id) {
             vm.selected_id = id;
@@ -68,18 +67,26 @@
 
         vm.openModal = function(install) {
             if (install) {
+                vm.showEdit = false;
                 vm.inst_hash = install.id;
                 vm.modal_title = "Installation " + install.name;
             } else {
+                vm.showEdit = true;
                 vm.modal_title = "Install " + vm.selected_app.app_name;
                 vm.inst_hash = lookUp.push().key;
                 lookUp.child(vm.inst_hash).set({
                     app_id: vm.selected_id,
                     install_name: 'New install'
                 });
-                updateInstalls();
             }
 
+        };
+
+        vm.saveName = function() {
+            lookUp.child(vm.inst_hash).child('install_name').set(vm.new_install_name);
+            $('#install_modal').modal('hide');
+            vm.new_install_name = null;
+            updateInstalls();
         };
 
         vm.removeInstall = function(id) {

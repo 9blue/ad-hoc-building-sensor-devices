@@ -15,7 +15,8 @@
                                 <button data-toggle="collapse" data-target="#{{v.id}}" aria-expanded="false" class="list-group-item">{{v.name}}</button>
                                 <div class="collapse" id="{{v.id}}">
                                     <div class="well">
-                                        This is {{v.name}}<br/>
+                                        This is {{v.name}}
+                                        <br/>
                                         <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#install_modal" ng-click="ai.openModal(v)">QR Code</button>
                                         <button class="btn btn-danger btn-sm pull-right" ng-click="ai.removeInstall(v.id)">Remove</button>
                                     </div>
@@ -40,20 +41,22 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">{{ai.modal_title}}</h4>
             </div>
             <div class="modal-body">
                 <div ng-if="ai.inst_hash">
-                    Please scan QR Code below.
+                    <label>Please scan QR Code below.</label>
                     <img class="center-block" ng-src="https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl={{ai.inst_hash}}">
                 </div>
                 <div ng-if="!ai.inst_hash">
-                    Waiting for installation instruction.
+                    <label>Waiting for installation instruction.</label>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <!-- <button type="submit" form="new_app" class="btn btn-primary">Install Application</button> -->
+                <form class="form-inline" ng-if="ai.showEdit" ng-submit="ai.saveName()">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Name your instance" ng-model="ai.new_install_name" required="required">
+                    </div>
+                    <button type="submit" class="btn btn-info pull-right">Save</button>
+                </form>
             </div>
         </div>
     </div>
