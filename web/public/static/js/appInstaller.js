@@ -76,14 +76,17 @@
                 vm.inst_hash = lookUp.push().key;
                 lookUp.child(vm.inst_hash).set({
                     app_id: vm.selected_id,
-                    install_name: 'New install'
+                    install_name: true,
+                    num_device: true
                 });
             }
 
         };
 
         vm.saveName = function() {
-            lookUp.child(vm.inst_hash).child('install_name').set(vm.new_install_name);
+            var cur_install = lookUp.child(vm.inst_hash);
+            cur_install.child('install_name').set(vm.new_install_name);
+            cur_install.child('num_device').set(vm.new_device_num);
             $('#install_modal').modal('hide');
             vm.new_install_name = null;
             updateInstalls();
