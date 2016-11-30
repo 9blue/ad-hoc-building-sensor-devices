@@ -35,7 +35,10 @@
         <activity android:name=".mad_hoc.ui.SensorActivity">
         </activity>
         <activity android:name=".mad_hoc.ui.ListActivity">
-
+        </activity>
+        <activity android:name=".mad_hoc.ui.MultiTrackerActivity">
+        </activity>
+        <activity android:name=".mad_hoc.ui.QueueDisplayActivity">
         </activity>
     </application>
 

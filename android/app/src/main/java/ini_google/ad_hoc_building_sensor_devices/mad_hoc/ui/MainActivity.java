@@ -3,9 +3,7 @@ package ini_google.ad_hoc_building_sensor_devices.mad_hoc.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +24,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -68,7 +65,9 @@ public class MainActivity extends AppCompatActivity {
         //connectedList = (TextView) findViewById(R.id.connectedList);
         urlTextView = (EditText) findViewById(R.id.urlTextView);
         scanButton = (Button) findViewById(R.id.scanButton);
+
         //startButton = (Button) findViewById(R.id.startButton);
+
         instanceID = "";
         mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         configData = "";
@@ -93,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+
         scanButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //Propagate Main Activity to IntentIntegrator
@@ -153,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                             try {
                                 //default config for the app from firebase
                                 configFromFireBase = new JSONObject((HashMap) dataSnapshot.getValue());
+                                //switch
                                 Intent intent = new Intent(activity, ListActivity.class);
                                 intent.putExtra("sensorConfig", configFromFireBase.toString());
                                 intent.putExtra("instanceID", instanceID);

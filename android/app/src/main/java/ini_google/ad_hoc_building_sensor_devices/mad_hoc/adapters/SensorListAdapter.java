@@ -20,15 +20,15 @@ import ini_google.ad_hoc_building_sensor_devices.mad_hoc.ui.ListActivity.Paramet
 public class SensorListAdapter extends BaseExpandableListAdapter{
 
         private Context _context;
-        private List<String> _listDataHeader; // header titles
+        private String _DataHeader; // header titles
         // child data in format of header title, child title
         private HashMap<String, List<Parameter>> _listDataChild;
         private HashSet<ID> _listIDSet;
 
-        public SensorListAdapter(Context context, List<String> listDataHeader,
+        public SensorListAdapter(Context context, String DataHeader,
                                      HashMap<String, List<Parameter>> listChildData) {
             this._context = context;
-            this._listDataHeader = listDataHeader;
+            this._DataHeader = DataHeader;
             this._listDataChild = listChildData;
             this._listIDSet = new HashSet<>();
 
@@ -48,7 +48,7 @@ public class SensorListAdapter extends BaseExpandableListAdapter{
 
         @Override
         public Object getChild(int groupPosition, int childPosititon) {
-            return this._listDataChild.get(this._listDataHeader.get(groupPosition))
+            return this._listDataChild.get(this._DataHeader)
                     .get(childPosititon);
         }
 
@@ -63,7 +63,7 @@ public class SensorListAdapter extends BaseExpandableListAdapter{
 
             String childText = (String) ((Parameter)getChild(groupPosition, childPosition)).getItem();
             String childVal = (String) ((Parameter)getChild(groupPosition, childPosition)).getVal();
-            Boolean fixed = (Boolean)((Parameter)getChild(groupPosition, childPosition)).getFixed();
+            //Boolean fixed = (Boolean)((Parameter)getChild(groupPosition, childPosition)).getFixed();
 
             if (convertView == null) {
                 LayoutInflater infalInflater = (LayoutInflater) this._context
@@ -76,7 +76,8 @@ public class SensorListAdapter extends BaseExpandableListAdapter{
 
             EditText txtListChildVal = (EditText) convertView
                     .findViewById(R.id.lblListItemVal);
-            txtListChildVal.setFocusable(!fixed);
+            // need to modift
+            txtListChildVal.setFocusable(true);
 
             txtListChildItem.setText(childText);
 
@@ -98,19 +99,19 @@ public class SensorListAdapter extends BaseExpandableListAdapter{
 
         @Override
         public int getChildrenCount(int groupPosition) {
-            return this._listDataChild.get(this._listDataHeader.get(groupPosition))
+            return this._listDataChild.get(this._DataHeader)
                         .size();
 
         }
 
         @Override
         public Object getGroup(int groupPosition) {
-            return this._listDataHeader.get(groupPosition);
+            return this._DataHeader;
         }
 
         @Override
         public int getGroupCount() {
-            return this._listDataHeader.size();
+            return 1;
         }
 
 
@@ -168,8 +169,8 @@ public class SensorListAdapter extends BaseExpandableListAdapter{
             }
         }
 
-        public void updateList(List<String> listDataHeader,HashMap<String, List<Parameter>> listChildData) {
-            listDataHeader = this._listDataHeader;
+        public void updateList(HashMap<String, List<Parameter>> listChildData) {
+            //listDataHeader = this._listDataHeader;
             listChildData = this._listDataChild;
         }
 

@@ -35,8 +35,9 @@ public class ListActivity extends AppCompatActivity {
     private Activity activity = this;
     SensorListAdapter listAdapter;
     ExpandableListView expListView;
-    List<String> listDataHeader;
+    String DataHeader;
     HashMap<String, List<Parameter>> listDataChild;
+    HashMap<String, HashMap<String, List<Parameter>>> record;
     private TextView AppName;
     private String targetSensor = null;
     private Button deployButton, confirmButton;
@@ -49,12 +50,13 @@ public class ListActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.list);
+        setContentView(R.layout.activity_list);
         AppName = (TextView) findViewById(R.id.appView);
         deployButton = (Button) findViewById(R.id.deployButton);
         confirmButton = (Button) findViewById(R.id.confirmButton);
         spinner = (Spinner)findViewById(R.id.spinner);
         lookupTable = new HashMap<String, String>();
+        record = new HashMap<String, HashMap<String, List<Parameter>>>();
         deviceConfig = "";
         lookupTableInit(lookupTable);
 
@@ -78,8 +80,13 @@ public class ListActivity extends AppCompatActivity {
                 targetSensor = adapterView.getSelectedItem().toString();
                 Toast.makeText(activity, adapterView.getSelectedItem().toString() + " is chosen", Toast.LENGTH_LONG).show();
                 // update listAdapter
-                prepareListData(configData);
-                listAdapter = new SensorListAdapter(activity, listDataHeader, listDataChild);
+
+                if (!record.containsKey(targetSensor)) {
+                    prepareListData(configData);
+                } else {
+                    listDataChild = record.get(targetSensor);
+                }
+                listAdapter = new SensorListAdapter(activity, targetSensor, listDataChild);
                 expListView.setAdapter(listAdapter);
             }
             public void onNothingSelected(AdapterView arg0) {
@@ -96,22 +103,38 @@ public class ListActivity extends AppCompatActivity {
                 listAdapter.updateVal();
                 UpdateJson(configData);
                 Toast.makeText(activity, "Value Updated Successfully", Toast.LENGTH_LONG).show();
+                record.put(targetSensor, listDataChild);
             }
         });
 
         deployButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listAdapter.updateList(listDataHeader, listDataChild);
+                listAdapter.updateList(listDataChild);
                 listAdapter.notifyDataSetChanged();
 
-                Intent intent = new Intent(activity, SensorActivity.class);
-                if(!deviceConfig.isEmpty())intent.putExtra("sensorConfig",deviceConfig );
+                //Intent intent;
+                //Intent intent_tracker = new Intent(activity, MultiTrackerActivity.class);
 
-                else Toast.makeText(activity, "device configuration is empty", Toast.LENGTH_LONG).show();
-                intent.putExtra("instanceID",bundle.get("instanceID").toString());
+                if(!deviceConfig.isEmpty()){
+                   Intent intent = null;
+                   if(targetSensor.equals("")) {
+                       intent = new Intent(activity, SensorActivity.class);
+                       intent.putExtra("sensorConfig", deviceConfig);
+                   } else if(targetSensor.equals("camera")) {
+                       intent = new Intent(activity, MultiTrackerActivity.class);
+                   } else if(targetSensor.equals("screen")) {
+                       // get queue information from firebase
+                       intent = new Intent(activity, QueueDisplayActivity.class);
+                       intent.putExtra("sensorConfig", deviceConfig);
+                   }
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(activity, "device configuration is empty", Toast.LENGTH_LONG).show();
+                }
+                // intent.putExtra("instanceID",bundle.get("instanceID").toString());
                 // set data back to firebase
-                startActivity(intent);
+                // startActivity(intent);
             }
         });
 
@@ -131,45 +154,52 @@ public class ListActivity extends AppCompatActivity {
 
     private void prepareListData(String configData) {
         try {
-            //System.out.println("json:" + configData);
+            System.out.println("json:" + configData);
             JSONObject config = new JSONObject(configData);
 
-            listDataHeader = new ArrayList<String>();
-            listDataChild = new HashMap<String, List<Parameter>>();
 
-            Iterator<?> keys = config.keys();
-            Parameter parameter = null;
-            List<Parameter> parameters = null;
+            //listDataHeader = new ArrayList<String>();
+            //if (listDataChild == null) {
+                listDataChild = new HashMap<String, List<Parameter>>();
+
+                Iterator<?> keys = config.keys();
+                Parameter parameter = null;
+                List<Parameter> parameters = null;
 
 //            while(keys.hasNext()) {
                 parameters = new ArrayList<Parameter>();
-                //String key = (String) keys.next();
+//                String key = (String) keys.next();
                 String key = targetSensor;
                 JSONObject configSensor = (JSONObject) config.get(key);
                 parameter = null;
                 String type = configSensor.get("type").toString();
 
-                listDataHeader.add(key);
+                //listDataHeader.add(key);
 
-                if (configSensor.has("threshold_upper")) {
-                    parameter = null;
-                    parameter = new Parameter("threshold_upper", configSensor.get("threshold_upper").toString(),"Int",configSensor.get("threshold_fixed").toString());
+                if (key.equals("light") && configSensor.has("threshold_upper")) {
+                    //parameter = null;
+                    parameter = new Parameter("threshold_upper", configSensor.get("threshold_upper").toString(), "Int");
                     parameters.add(parameter);
                 }
-                if(configSensor.has("threshold_lower")) {
-                    parameter = null;
-                    parameter = new Parameter("threshold_lower", configSensor.get("threshold_lower").toString(),"Int",configSensor.get("threshold_fixed").toString());
+                if (key.equals("light") && configSensor.has("threshold_lower")) {
+                    //parameter = null;
+                    parameter = new Parameter("threshold_lower", configSensor.get("threshold_lower").toString(), "Int");
                     parameters.add(parameter);
                 }
-                if(configSensor.has("sampling_rate")) {
-                    parameter = null;
-                    parameter = new Parameter("sampling_rate", configSensor.get("sampling_rate").toString(),"Int",configSensor.get("threshold_fixed").toString());
+                if (key.equals("light") && configSensor.has("sampling_rate")) {
+                    //parameter = null;
+                    parameter = new Parameter("sampling_rate", configSensor.get("sampling_rate").toString(), "Int");
                     parameters.add(parameter);
                 }
-                listDataChild.put(listDataHeader.get(listDataHeader.indexOf(key)), parameters);
+                if (key.equals("camera")) {
+                    parameter = new Parameter("queue_number", "0", "Int");
+                    parameters.add(parameter);
+                }
+                listDataChild.put(targetSensor, parameters);
+//            }
 //            }
 
-
+            //System.out.println("Header: " + listDataHeader);
 
         } catch (Exception e) {
             Toast.makeText(this, "Configuration Error", Toast.LENGTH_LONG).show();
@@ -195,9 +225,10 @@ public class ListActivity extends AppCompatActivity {
                for(Parameter parameter:list) {
                    String item = parameter.getItem();
                    String val = parameter.getVal();
-                   boolean fixed = parameter.getFixed();
+                   //boolean fixed = parameter.getFixed();
                    chosenConfig.put(item, val);
                }
+
             default_config = new JSONObject();
             default_config.put(targetSensor,chosenConfig);
             deviceConfig = default_config.toString();
@@ -248,13 +279,11 @@ public class ListActivity extends AppCompatActivity {
         String item;
         String val;
         String type;
-        String fixed;
 
-        Parameter(String item, String val, String type, String fixed) {
+        Parameter(String item, String val, String type) {
             this.item = item;
             this.val = val;
             this.type = type;
-            this.fixed = fixed;
         }
 
         public String getItem() {
@@ -281,17 +310,17 @@ public class ListActivity extends AppCompatActivity {
             this.type = type;
         }
 
-        public Boolean getFixed() {
-            if (this.fixed.equals("true")) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public void setFixed(String Type) {
-            this.fixed = fixed;
-        }
+//        public Boolean getFixed() {
+//            if (this.fixed.equals("true")) {
+//                return true;
+//            } else {
+//                return false;
+//            }
+//        }
+//
+//        public void setFixed(String Type) {
+//            this.fixed = fixed;
+//        }
     }
 
 
