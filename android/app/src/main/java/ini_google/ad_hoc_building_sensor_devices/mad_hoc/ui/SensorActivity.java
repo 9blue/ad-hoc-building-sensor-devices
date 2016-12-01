@@ -10,17 +10,22 @@ import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.speech.tts.TextToSpeech;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,8 +39,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import ini_google.ad_hoc_building_sensor_devices.R;
@@ -58,6 +65,16 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     private int lowerThreshold,upperThreshold;
     private String instanceID ;
     private String type;
+    private Sensor accelerometer;
+
+    private float[] mGravity;
+    private float mAccel;
+    private float mAccelCurrent;
+    private float mAccelLast;
+    private float accThreshold;
+    private TextView textView;
+    TextToSpeech t1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,9 +89,13 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
         androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = null;
 
+        // textView = (TextView) findViewById(R.id.textView);
+        mAccel = 0.00f;
+        mAccelCurrent = SensorManager.GRAVITY_EARTH;
+        mAccelLast = SensorManager.GRAVITY_EARTH;
         try {
             this.deviceConfig = new JSONObject(bundle.get("sensorConfig").toString());
 
@@ -92,30 +113,30 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 String parameter = configParameters.next();
                 String parameterType = ((JSONObject) this.deviceConfig.get(parameter)).get("type").toString();
                 int role = getResources().getIdentifier(parameterType, "String", getPackageName());
+                this.type = parameterType;
                 if (parameterType.equals("LIGHT")) {
                     configureSensors(parameter,parameterType);
-                    this.type = parameterType;
+
                 }
                 if (parameterType.equals("ACCELEROMETER")){
                     configureSensors(parameter,parameterType);
-                    this.type = parameterType;
                 }
-                if (parameterType.equals("FLASH")) {
+                if (parameterType.equals("FLASH") || parameterType.equals("SPEAKER")) {
                     configureActuators(parameter,parameterType);
-                    this.type = parameterType;
+
                 }
                 if (parameterType.equals("SCREEN")) {
                     configureActuators(parameter,parameterType);
-                    this.type = parameterType;
                 }
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         cancelButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
+                //mSensorManager.unregisterListener();
                 Intent intent = new Intent();
                 intent.setClass(activity, MainActivity.class);
                 startActivity(intent);
@@ -153,6 +174,33 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             Canvas c = new Canvas(b);
             c.drawRGB(50,50,50);
         }
+        if(this.type.equals("SPEAKER")){
+            t1 = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    if(status != TextToSpeech.ERROR) {
+                        t1.setLanguage(Locale.US);
+                    }
+                }
+            });
+            actuators.setValue(false);
+            actuators.addValueEventListener(new ValueEventListener() {
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String speakerText = dataSnapshot.getValue().toString();
+                    // String speakString = this.desc;
+                    speakMessage(speakerText);
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    System.out.println(databaseError.toString());
+                }
+            });
+        }
+    }
+
+    private void speakMessage(String speakerText){
+        Toast.makeText(activity, "speaker invoked", Toast.LENGTH_SHORT).show();
+        t1.speak(speakerText, TextToSpeech.QUEUE_FLUSH, null, null);
     }
 
     private void turnOnFlashLight() {
@@ -213,27 +261,29 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             sensorType.setText(parameterType);
 
             sensors.setValue(true);
-
+            JSONObject config = (JSONObject)(this.deviceConfig.get(parameter));
             if(parameterType.equals("LIGHT")) {
                 mSensor = mSensorManager.getDefaultSensor(5);
+                lowerThreshold = Integer.parseInt(config.get("threshold_lower").toString());
+                upperThreshold = Integer.parseInt(config.get("threshold_upper").toString());
+
             }
             if(parameterType.equals("ACCELEROMETER")){
-                //vrushali part
                 mSensor = mSensorManager.getDefaultSensor(1);
+                accThreshold = Float.parseFloat(config.get("threshold_lower").toString());
             }
             else{
                 sensorValue.setText("Sensor not supported");
             }
-            JSONObject config = (JSONObject)(this.deviceConfig.get(parameter));
-            lowerThreshold = Integer.parseInt(config.get("threshold_lower").toString());
-            upperThreshold = Integer.parseInt(config.get("threshold_upper").toString());
-
             if(mSensor==null){
                 taskView.setText("Sensor Not Available");
-            } else{
+            } else {
                 //taskView.setText(sensorConfig.get("application_name").toString());
                 System.out.println("Job Is Running");
-                int interval =  Integer.parseInt(config.get("sampling_rate").toString())*1000000;
+                int interval = 1000000;
+                if (config.has("sampling_rate")) {
+                    interval = Integer.parseInt(config.get("sampling_rate").toString()) * 1000000;
+                }
                 mSensorManager.registerListener(this,mSensor,interval);
             }
 
@@ -249,7 +299,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
             public void onDataChange(DataSnapshot dataSnapshot) {
                 try {
-                   String app_id = dataSnapshot.getValue().toString();
+                    String app_id = dataSnapshot.getValue().toString();
                     DatabaseReference applicationName = database.getReference("apps").child(app_id).child("app_name");
                     applicationName.addListenerForSingleValueEvent( new ValueEventListener() {
                         @Override
@@ -293,8 +343,21 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             }
         }
         if(this.type.equals("ACCELEROMETER")){
-            //vrushali dot the accelerometer logic here..use the above two lines to update the values in firebase
-
+            mGravity = event.values.clone();
+            // Shake detection
+            float x = mGravity[0];
+            float y = mGravity[1];
+            float z = mGravity[2];
+            mAccelLast = mAccelCurrent;
+            mAccelCurrent = (float) Math.sqrt(x*x + y*y + z*z);
+            float delta = mAccelCurrent - mAccelLast;
+            mAccel = mAccel * 0.9f + delta;
+            if(mAccel > accThreshold) {
+                Toast.makeText(activity, "Motion detected!", Toast.LENGTH_SHORT).show();
+                sensors.child("value").setValue(mAccel);
+                // sensors.child(new Date().toString()).setValue(mAccel);
+                sensorValue.setText(Float.toString(mAccel));
+            }
         }
     }
 

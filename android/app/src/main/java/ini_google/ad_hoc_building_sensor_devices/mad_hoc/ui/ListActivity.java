@@ -118,15 +118,10 @@ public class ListActivity extends AppCompatActivity {
 
                 if(!deviceConfig.isEmpty()){
                    Intent intent = null;
-                   if(targetSensor.equals("")) {
+                   if(!targetSensor.isEmpty()) {
                        intent = new Intent(activity, SensorActivity.class);
                        intent.putExtra("sensorConfig", deviceConfig);
-                   } else if(targetSensor.equals("camera")) {
-                       intent = new Intent(activity, MultiTrackerActivity.class);
-                   } else if(targetSensor.equals("screen")) {
-                       // get queue information from firebase
-                       intent = new Intent(activity, QueueDisplayActivity.class);
-                       intent.putExtra("sensorConfig", deviceConfig);
+                       intent.putExtra("instanceID", bundle.get("instanceID").toString());
                    }
                     startActivity(intent);
                 } else {
@@ -181,7 +176,7 @@ public class ListActivity extends AppCompatActivity {
                     parameter = new Parameter("threshold_upper", configSensor.get("threshold_upper").toString(), "Int");
                     parameters.add(parameter);
                 }
-                if (key.equals("light") && configSensor.has("threshold_lower")) {
+                if ((key.equals("light") || key.equals("accelerometer")) && configSensor.has("threshold_lower")) {
                     //parameter = null;
                     parameter = new Parameter("threshold_lower", configSensor.get("threshold_lower").toString(), "Int");
                     parameters.add(parameter);
