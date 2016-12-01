@@ -17,16 +17,14 @@
                 threshold_upper: true
             }
         }, {
-            name: 'accelerator',
-            label: 'Accelerator',
+            name: 'accelerometer',
+            label: 'Accelerometer',
             disable: false,
-            tpl_url: '/template/sensors_tpl/accelerator.html',
+            tpl_url: '/template/sensors_tpl/accelerometer.html',
             config: {
-                type: 'ACCELERATOR',
+                type: 'ACCELEROMETER',
                 desc: '',
-                sampling_rate: 20,
-                threshold_lower: true,
-                threshold_upper: true
+                threshold_lower: true
             }
         }, {
             name: 'camera',
