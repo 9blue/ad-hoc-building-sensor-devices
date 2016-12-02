@@ -50,8 +50,14 @@
 
         <ExpandableListView
         android:layout_width="fill_parent"
-        android:layout_height="215dp"
+        android:layout_height="169dp"
         android:id="@+id/sensorList"/>
+
+        <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"/>
 
         <Button
             android:text="Calibrate Sensors"
