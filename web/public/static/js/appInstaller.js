@@ -43,8 +43,18 @@
             });
         }
 
+        function processApps(data) {
+            vm.apps = {};
+            data.forEach(function(child) {
+                var key = child.key;
+                var app = child.val();
+                app['app_id'] = key;
+                vm.apps[key]=app;
+            });
+        }
         getAppsPromise().then(function(data) {
-            vm.apps = data.val();
+            // vm.apps = data.val();
+            processApps(data);
             angular.forEach(vm.apps, function(app) {
                 app.components = _.keys(app.default_config);
             });
@@ -76,8 +86,8 @@
                 vm.inst_hash = lookUp.push().key;
                 lookUp.child(vm.inst_hash).set({
                     app_id: vm.selected_id,
-                    install_name: true,
-                    num_device: true
+                    install_name: 'New Install',
+                    num_device: 0
                 });
             }
 

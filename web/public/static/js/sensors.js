@@ -34,9 +34,7 @@
             config: {
                 type: 'CAMERA',
                 desc: '',
-                sampling_rate: 30,
-                threshold_lower: true,
-                threshold_upper: true
+                camera_location: 'SOMEWHERE',
             }
         }];
 
@@ -56,7 +54,10 @@
             tpl_url: '/template/acturator_tpl/screen.html',
             config: {
                 type: 'SCREEN',
-                desc: ''
+                desc: '',
+                display_color: '#F44242',
+                display_text: '',
+                display_value: 0
             }
         }, {
             name: 'speaker',
@@ -65,7 +66,8 @@
             tpl_url: '/template/acturator_tpl/speaker.html',
             config: {
                 type: 'SPEAKER',
-                desc: ''
+                desc: '',
+                sound_message: 'Go'
             }
         }];
 

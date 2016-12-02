@@ -1,47 +1,44 @@
 (function() {
     'use strict';
 
-    madAPP.controller('demoViewController', demoViewController);
+    madAPP.controller('demoQueueController', demoQueueController);
 
-    function demoViewController($timeout) {
+    function demoQueueController($timeout) {
         var vm = this;
         vm.text = 'Firebase rulez!';
 
         var dbRef = firebase.database().ref();
-        var appid = "-KWtggWikwCYiCoViZE1";
+        var appid = "-KXwrWAZ_cA6offBcj-j";
         vm.app_config = null;
         var instances = null;
         var appRef = dbRef.child('apps').child(appid);
         var install_sensors = dbRef.child('install_sensors');
         var install_actuators = dbRef.child('install_actuators');
-        var ACTIVATION_VAL = 200;
-
-
-
+        var ACTIVATION_VAL = 2;
 
         vm.light_reading = null;
         vm.flash_on = null;
 
         appRef.once('value').then(function(snapshot) {
             vm.app_config = snapshot.val();
+
             instances = _.keys(vm.app_config.instances);
         });
 
         var app_idsRef = dbRef.child('app_ids');
 
-        app_idsRef.orderByValue().equalTo(appid).on('child_added', function(data) {
+        app_idsRef.orderByChild("app_id").equalTo(appid).on('child_added', function(data) {
             console.log('new_instance', data.key);
             var new_instance = data.key;
-
             var install_sensorRef = install_sensors.child(new_instance);
             var install_actuatorRef = install_actuators.child(new_instance);
             var actuator = null;
-            install_actuatorRef.child('flash1').once("value").then(function(snapshot) {
+            install_actuatorRef.child('camera').once("value").then(function(snapshot) {
                 actuator = _.keys(snapshot.val())[0];
-                console.log('flash1', actuator);
+                console.log('flash', actuator);
             });
 
-            install_sensorRef.child('light1').on('value', function(snapshot) {
+            install_sensorRef.child('light').on('value', function(snapshot) {
                 $timeout(function() {
                     var device_id = _.keys(snapshot.val())[0];
                     vm.light_reading = _.map(_.keys(snapshot.val()), function(x) {
@@ -53,10 +50,10 @@
                     console.log(flash);
                     if (flash) {
                         vm.flash_on = true;
-                        install_actuatorRef.child('flash1').child(actuator).set(true);
+                        install_actuatorRef.child('flash').child(actuator).set(true);
                     } else {
                         vm.flash_on = false;
-                        install_actuatorRef.child('flash1').child(actuator).set(false);
+                        install_actuatorRef.child('flash').child(actuator).set(false);
                     }
                 }, 0);
             });

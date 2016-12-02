@@ -6,7 +6,7 @@
 
         $stateProvider
         // main view
-        .state('home', {
+            .state('home', {
             url: '/home',
             templateUrl: '/template/main.html',
             controller: 'mainController',
@@ -34,12 +34,25 @@
         //     templateUrl: '/template/app_view.html',
         //     controller: 'appViewController',
         //     controllerAs: 'av'
+        .state('demo_queue', {
+            url: '/demo_queue',
+            templateUrl: '/template/demo_queue.html',
+            controller: 'demoQueueController',
+            controllerAs: 'dq'
+        })
 
-        .state('demo', {
-            url: '/demo',
-            templateUrl: '/template/demo.html',
-            controller: 'demoViewController',
-            controllerAs: 'dv'
+        .state('demo_chair', {
+            url: '/demo_chair',
+            templateUrl: '/template/demo_chair.html',
+            controller: 'demoChairController',
+            controllerAs: 'dc'
+        })
+
+        .state('demo_light', {
+            url: '/demo_light',
+            templateUrl: '/template/demo_light.html',
+            controller: 'demoLightController',
+            controllerAs: 'dl'
         });
 
     });
