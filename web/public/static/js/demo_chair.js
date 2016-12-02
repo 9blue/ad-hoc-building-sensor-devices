@@ -8,20 +8,18 @@
         vm.text = 'Firebase rulez!';
 
         var dbRef = firebase.database().ref();
-        var appid = "-KXwk9l34wEwHLVKZ6fr";
+        var appid = "-KY0VEKXfHvj_tbzTh4c";
         vm.app_config = null;
         var instances = null;
         var appRef = dbRef.child('apps').child(appid);
         var install_sensors = dbRef.child('install_sensors');
         var install_actuators = dbRef.child('install_actuators');
-        var ACTIVATION_VAL = 200;
 
         vm.light_reading = null;
         vm.flash_on = null;
 
         appRef.once('value').then(function(snapshot) {
             vm.app_config = snapshot.val();
-
             instances = _.keys(vm.app_config.instances);
         });
 
@@ -29,32 +27,30 @@
 
         app_idsRef.orderByChild("app_id").equalTo(appid).on('child_added', function(data) {
             console.log('new_instance', data.key);
+            console.log('instance data', data.val());
             var new_instance = data.key;
+            var num_device = data.val().num_device;
             var install_sensorRef = install_sensors.child(new_instance);
             var install_actuatorRef = install_actuators.child(new_instance);
-            var actuator = null;
-            install_actuatorRef.child('flash').once("value").then(function(snapshot) {
-                actuator = _.keys(snapshot.val())[0];
-                console.log('flash', actuator);
+            var actuator_id = null;
+            install_actuatorRef.child('speaker').once("value").then(function(snapshot) {
+                actuator_id = _.keys(snapshot.val())[0];
+                console.log('speaker', actuator_id);
             });
 
-            install_sensorRef.child('light').on('value', function(snapshot) {
+            var num_moved_device = 0;
+            install_sensorRef.child('accelerometer').orderByChild("value").equalTo(true).on('child_added', function(snapshot) {
                 $timeout(function() {
-                    var device_id = _.keys(snapshot.val())[0];
-                    vm.light_reading = _.map(_.keys(snapshot.val()), function(x) {
-                        return snapshot.val()[x];
-                    });
-                    vm.light_reading = vm.light_reading[0].value;
-                    console.log(vm.light_reading);
-                    var flash = vm.light_reading < ACTIVATION_VAL;
-                    console.log(flash);
-                    if (flash) {
-                        vm.flash_on = true;
-                        install_actuatorRef.child('flash').child(actuator).set(true);
-                    } else {
-                        vm.flash_on = false;
-                        install_actuatorRef.child('flash').child(actuator).set(false);
-                    }
+                    // var accelerometers = _.keys(snapshot.val());
+                    num_moved_device += 1;
+                    console.log(snapshot.val());
+                    var msg = num_moved_device > 1 ? num_moved_device + 'guests have joined' : num_moved_device + 'guest has joined';
+                    install_actuatorRef.child('speaker').child(actuator_id).child('sound_message').set(msg);
+                    // install_actuatorRef.child('speaker').child(actuator_id).set(msg);
+
+                    // if (num_moved_device == num_device - 1) {
+                    //     install_actuatorRef.child('speaker').child(actuator_id).set('All Guests have joined');
+                    // }
                 }, 0);
             });
         });
