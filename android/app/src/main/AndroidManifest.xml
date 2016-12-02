@@ -38,8 +38,6 @@
         </activity>
         <activity android:name=".mad_hoc.ui.MultiTrackerActivity">
         </activity>
-        <activity android:name=".mad_hoc.ui.QueueDisplayActivity">
-        </activity>
     </application>
 
 </manifest>

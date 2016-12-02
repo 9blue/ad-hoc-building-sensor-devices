@@ -15,15 +15,15 @@
             android:layout_height="wrap_content"
             android:id="@+id/queue"
             android:layout_weight="1"
-            android:textSize="50sp"/>
+            android:textSize="24sp"/>
 
         <TextView
-            android:text="0"
+            android:text="Somewhere"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/faceCount"
             android:layout_weight="1"
-            android:textSize="50sp"/>
+            android:textSize="24sp"/>
 
     </LinearLayout>
 

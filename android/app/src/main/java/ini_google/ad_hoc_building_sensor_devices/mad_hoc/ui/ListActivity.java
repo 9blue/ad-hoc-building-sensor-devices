@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +29,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -55,6 +55,7 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private int calibrationCount;
     private float minValue,maxValue,avgValue;
+    private ProgressBar progressBar;
 
 
     @Override
@@ -71,6 +72,8 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
         lookupTableInit(lookupTable);
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = null;calibrationCount = 0;minValue =0 ;maxValue=0;avgValue=0;
+
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
 
         final Bundle bundle = getIntent().getExtras();
         configData = bundle.get("sensorConfig").toString();
@@ -105,13 +108,15 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
                 Toast.makeText(activity, "No sensor is selected", Toast.LENGTH_LONG).show();
             }
         });
+        progressBar.setVisibility(View.INVISIBLE);
 
         calibrateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                //use firebase code to update json
-                startCalibration();
+                progressBar.setVisibility(View.VISIBLE);
 
+                startCalibration();
             }
         });
 
@@ -145,6 +150,10 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
             mSensorManager.registerListener((SensorEventListener) this,mSensor,100000);
 
         }
+        else
+        {
+            setCalibraation();
+        }
         mSensor = null;
     }
 
@@ -163,10 +172,10 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
             avgValue+=sensor_value;
 
         }
-        if(calibrationCount == 149)
+        if(calibrationCount == 49)
         {
             calibrationCount =0;
-            avgValue = avgValue/150;
+            avgValue = avgValue/50;
             mSensorManager.unregisterListener(this);
             setCalibraation();
         }
@@ -187,6 +196,8 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
         prepareListData(configData);
         listAdapter.updateVal();
         UpdateJson(configData);
+        progressBar.setVisibility(View.INVISIBLE);
+        //progressBar.setVisibility(View.GONE);
         Toast.makeText(activity, "Sensos Calibrated Successfully", Toast.LENGTH_LONG).show();
         record.put(targetSensor, listDataChild);
         listAdapter = new SensorListAdapter(activity, targetSensor, listDataChild);
