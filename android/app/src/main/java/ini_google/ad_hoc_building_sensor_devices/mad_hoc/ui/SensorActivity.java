@@ -134,8 +134,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 if(parameterType.equals("CAMERA")){
                     Intent intent = new Intent(activity, MultiTrackerActivity.class);
 
-                    sensors.child(this.instanceID).child(parameter).child(((JSONObject)this.deviceConfig.get(parameter)).get("queue_number").toString()).child(device_id).setValue(true);
-                    intent.putExtra("sensor_url","install_sensors".concat("/").concat(this.instanceID).concat("/").concat(parameter).concat("/").concat(((JSONObject)this.deviceConfig.get(parameter)).get("queue_number").toString()).concat("/").concat(device_id));
+                    sensors.child(this.instanceID).child(parameter).child(device_id).child(((JSONObject)this.deviceConfig.get(parameter)).get("queue_number").toString()).setValue(true);
+                    intent.putExtra("sensor_url","install_sensors".concat("/").concat(this.instanceID).concat("/").concat(parameter).concat("/").concat(device_id).concat("/").concat(((JSONObject)this.deviceConfig.get(parameter)).get("queue_number").toString()));
                     intent.putExtra("instanceID", instanceID);
                     startActivity(intent);
                 }
