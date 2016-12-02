@@ -61,10 +61,13 @@ public class QueueListAdapter extends BaseExpandableListAdapter{
 
         TextView txtListChildVal = (TextView) convertView
                 .findViewById(R.id.faceCount);
-        // need to modift
-    //    txtListChildVal.setFocusable(true);
 
-        txtListChildItem.setText(childText);
+        if(childText.isEmpty())
+        {
+            txtListChildItem.setVisibility(View.INVISIBLE);
+        }
+        else {
+        txtListChildItem.setText(childText);}
         txtListChildVal.setText(childVal);
         txtListChildVal.setBackgroundColor(childColor);
 

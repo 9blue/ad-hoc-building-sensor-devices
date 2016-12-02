@@ -27,9 +27,12 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.MultiDetector;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ini_google.ad_hoc_building_sensor_devices.R;
@@ -52,6 +55,8 @@ public class MultiTrackerActivity extends AppCompatActivity{
     private static TextView faceCount;
     private Activity activity = this;
     public static List<Integer> idList;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference sensors;
 
     public static Handler handler;
 
@@ -60,38 +65,48 @@ public class MultiTrackerActivity extends AppCompatActivity{
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tracker);
-        backButton = (Button) findViewById(R.id.backButton);
-        faceCount = (TextView) findViewById(R.id.faceCount);
-        mPreview = (CameraSourcePreview) findViewById(R.id.preview);
-        mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
-        idList = new ArrayList<Integer>();
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_tracker);
+            backButton = (Button) findViewById(R.id.backButton);
+            faceCount = (TextView) findViewById(R.id.faceCount);
+            mPreview = (CameraSourcePreview) findViewById(R.id.preview);
+            mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
+            idList = new ArrayList<Integer>();
+            final Bundle bundle = getIntent().getExtras();
+            String sensor_url = bundle.get("sensor_url").toString();
+            sensors = database.getReference(sensor_url);
 
-        // Check for the camera permission before accessing the camera.  If the
-        // permission is not granted yet, request permission.
-        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        if (rc == PackageManager.PERMISSION_GRANTED) {
-            createCameraSource();
-        } else {
-            requestCameraPermission();
+            // Check for the camera permission before accessing the camera.  If the
+            // permission is not granted yet, request permission.
+            int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+            if (rc == PackageManager.PERMISSION_GRANTED) {
+                createCameraSource();
+            } else {
+                requestCameraPermission();
+            }
+
+            backButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(activity, MainActivity.class);
+                    startActivity(intent);
+                }
+            });
+
+            handler = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    faceCount.setText(String.valueOf(idList.size()));
+                    sensors.child("value").setValue(idList.size());
+                    sensors.child("last_modified").setValue(new Date().getTime());
+                    //System.out.println("test");
+                }
+            };
         }
-
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(activity, MainActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                faceCount.setText(String.valueOf(idList.size()));
-                //System.out.println("test");
-            }
-        };
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 

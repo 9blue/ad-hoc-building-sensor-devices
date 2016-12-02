@@ -61,7 +61,7 @@ public class ListActivity extends AppCompatActivity {
         lookupTableInit(lookupTable);
 
         final Bundle bundle = getIntent().getExtras();
-        configData =  (String) bundle.get("sensorConfig");
+        configData = bundle.get("sensorConfig").toString();
 
         // get the listview, (ViewHolder)
         expListView = (ExpandableListView) findViewById(R.id.sensorList);

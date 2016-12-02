@@ -9,7 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="ini_google.ad_hoc_building_sensor_devices.mad_hoc.ui.SensorActivity">
+    tools:context="ini_google.ad_ho0c_building_sensor_devices.mad_hoc.ui.SensorActivity">
 
     <LinearLayout
         android:orientation="vertical"
@@ -46,10 +46,15 @@
         <TextView
             android:text="configuration"
             android:layout_width="match_parent"
-            android:layout_height="178dp"
+            android:layout_height="100dp"
             android:id="@+id/configuration"
 
             android:layout_marginTop="10dp"/>
+        <TextView
+            android:text=""
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:id="@+id/screen_text"/>
 
     </LinearLayout>
 

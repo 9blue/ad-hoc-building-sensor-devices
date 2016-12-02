@@ -44,13 +44,9 @@ public class MainActivity extends AppCompatActivity {
     private int triggerPoint = 0;
 
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
-    //private DatabaseReference devices = database.getReference().child("devices");
     private DatabaseReference defaultConfig;
     private DatabaseReference applicationInfo;
-    private DatabaseReference actuationLocation;
     private JSONObject configFromFireBase;
-    private CameraManager mCameraManager;
-    private String configData;
 
 
     @Override
@@ -69,8 +65,6 @@ public class MainActivity extends AppCompatActivity {
         //startButton = (Button) findViewById(R.id.startButton);
 
         instanceID = "";
-        mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-        configData = "";
 
         urlTextView.addTextChangedListener(new TextWatcher() {
             @Override

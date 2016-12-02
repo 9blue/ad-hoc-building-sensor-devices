@@ -9,6 +9,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -27,6 +33,8 @@ public class QueueDisplayActivity extends AppCompatActivity{
     private Button backButton;
     private Activity activity = this;
     private String configData = null;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference actuator;
 
 
 
@@ -38,11 +46,31 @@ public class QueueDisplayActivity extends AppCompatActivity{
         backButton = (Button) findViewById(R.id.backButton);
 
         final Bundle bundle = getIntent().getExtras();
-        configData =  (String) bundle.get("sensorConfig");
+        //configData =  bundle.get("sensorConfig").toString();
+        String actuator_url = bundle.get("actuator_url").toString();
+        actuator = database.getReference(actuator_url);
+        actuator.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.hasChildren()) {
+                    JSONObject actuator_display = new JSONObject((HashMap) dataSnapshot.getValue());
+                    Iterator display_keys = actuator_display.keys();
+                    while(display_keys.hasNext()){
+                        String display = display_keys.next().toString();
+                        if(!display.startsWith("display")){
+                            actuator_display.remove(display);
+                        }
+                    }
+                    prepareListData(actuator_display);
+                }
+            }
 
-        prepareListData(configData);
-        listAdapter = new QueueListAdapter(activity, listDataHeader, listDataChild);
-        expListView.setAdapter(listAdapter);
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,30 +82,50 @@ public class QueueDisplayActivity extends AppCompatActivity{
 
     }
 
-    private void prepareListData(String configData) {
+    private void prepareListData(JSONObject displayData) {
         try {
-            System.out.println("json:" + configData);
-            JSONObject config = new JSONObject(configData);
-
             listDataHeader = new ArrayList<String>();
             listDataChild = new HashMap<String, List<Queue>>();
 
             listDataHeader.add("Queue List");
             listDataChild = new HashMap<String, List<Queue>>();
 
-            Iterator<?> keys = config.keys();
+            Iterator<?> keys = displayData.keys();
             List<Queue> queues = new ArrayList<Queue>();
-//            while(keys.hasNext()) {
-//                String key = (String) keys.next();
-//                String value = config.get(key).toString();
-//                Queue queue = new Queue(key, value);
-//
-//            }
-            // test
-            queues.add(new Queue("queue1", "10", Color.BLUE));
-            queues.add(new Queue("queue2", "12", Color.YELLOW));
-            queues.add(new Queue("queue3", "15", Color.RED));
+            while(keys.hasNext()){
+                String display = keys.next().toString();
+                JSONObject display_data = (JSONObject) displayData.get(display);
+                String text,value,color;
+                if(display_data.has("display_text")){
+                    text = display_data.get("display_text").toString();
+                }
+                else{
+                    text= "";
+                }
+                if(display_data.has("display_value")){
+                    value = display_data.get("display_value").toString();
+                }
+                else{
+                    value= "";
+                }
+                if(display_data.has("display_color")){
+                    color = display_data.get("display_color").toString();
+                }
+                else{
+                    color= "teal";
+                }
+                queues.add(new Queue(text, value, Color.parseColor(color)));
+
+
+            }
+
+            //queues.add(new Queue("queue1", "10", Color.BLUE));
+            //queues.add(new Queue("queue2", "12", Color.YELLOW));
+            //queues.add(new Queue("queue3", "15", Color.RED));
             listDataChild.put(listDataHeader.get(0), queues);
+
+            listAdapter = new QueueListAdapter(activity, listDataHeader, listDataChild);
+            expListView.setAdapter(listAdapter);
 
 
         } catch (Exception e) {

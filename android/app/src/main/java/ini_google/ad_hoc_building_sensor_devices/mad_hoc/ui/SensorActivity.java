@@ -114,12 +114,9 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 String parameterType = ((JSONObject) this.deviceConfig.get(parameter)).get("type").toString();
                 int role = getResources().getIdentifier(parameterType, "String", getPackageName());
                 this.type = parameterType;
-                if (parameterType.equals("LIGHT")) {
+                if (parameterType.equals("LIGHT") || parameterType.equals("ACCELEROMETER")) {
                     configureSensors(parameter,parameterType);
 
-                }
-                if (parameterType.equals("ACCELEROMETER")){
-                    configureSensors(parameter,parameterType);
                 }
                 if (parameterType.equals("FLASH") || parameterType.equals("SPEAKER")) {
                     configureActuators(parameter,parameterType);
@@ -127,6 +124,20 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 }
                 if (parameterType.equals("SCREEN")) {
                     configureActuators(parameter,parameterType);
+                    //Intent intent = new Intent(activity, QueueDisplayActivity.class);
+
+                    //actuators.child(this.instanceID).child(parameter).child(device_id).setValue(true);
+                    //intent.putExtra("actuator_url","install_actuator".concat("/").concat(this.instanceID).concat("/").concat(parameter).concat("/").concat(device_id));
+                    //intent.putExtra("instanceID", instanceID);
+                    //startActivity(intent);
+                }
+                if(parameterType.equals("CAMERA")){
+                    Intent intent = new Intent(activity, MultiTrackerActivity.class);
+
+                    sensors.child(this.instanceID).child(parameter).child(((JSONObject)this.deviceConfig.get(parameter)).get("queue_number").toString()).child(device_id).setValue(true);
+                    intent.putExtra("sensor_url","install_sensors".concat("/").concat(this.instanceID).concat("/").concat(parameter).concat("/").concat(((JSONObject)this.deviceConfig.get(parameter)).get("queue_number").toString()).concat("/").concat(device_id));
+                    intent.putExtra("instanceID", instanceID);
+                    startActivity(intent);
                 }
             }
 
@@ -144,6 +155,13 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         });
 
     }
+
+
+    protected void onPause() {
+        super.onPause();
+        mSensorManager.unregisterListener(this);
+    }
+
 
     private void configureActuators(String parameter, String parameterType){
         actuators = database.getReference("install_actuators").child(instanceID).child(parameter).child(device_id);
@@ -170,9 +188,12 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         }
         if(this.type.equals("SCREEN"))
         {
-            Bitmap b = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-            Canvas c = new Canvas(b);
-            c.drawRGB(50,50,50);
+            Intent intent = new Intent(activity, QueueDisplayActivity.class);
+
+            actuators.setValue(true);
+            intent.putExtra("actuator_url","install_actuators".concat("/").concat(this.instanceID).concat("/").concat(parameter).concat("/").concat(device_id));
+            intent.putExtra("instanceID", instanceID);
+            startActivity(intent);
         }
         if(this.type.equals("SPEAKER")){
             t1 = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -299,7 +320,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
             public void onDataChange(DataSnapshot dataSnapshot) {
                 try {
-                    String app_id = dataSnapshot.getValue().toString();
+                    JSONObject app_info = new JSONObject((HashMap) dataSnapshot.getValue());
+                    String app_id = app_info.get("app_id").toString();
                     DatabaseReference applicationName = database.getReference("apps").child(app_id).child("app_name");
                     applicationName.addListenerForSingleValueEvent( new ValueEventListener() {
                         @Override
@@ -354,8 +376,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             mAccel = mAccel * 0.9f + delta;
             if(mAccel > accThreshold) {
                 Toast.makeText(activity, "Motion detected!", Toast.LENGTH_SHORT).show();
-                sensors.child("value").setValue(mAccel);
-                // sensors.child(new Date().toString()).setValue(mAccel);
+                sensors.child("value").setValue(true);
+                sensors.child("last_modified").setValue(Long.toString(new Date().getTime()));
                 sensorValue.setText(Float.toString(mAccel));
             }
         }
