@@ -1,7 +1,12 @@
 package ini_google.ad_hoc_building_sensor_devices.mad_hoc.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -23,6 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +37,7 @@ import java.util.Map;
 import ini_google.ad_hoc_building_sensor_devices.R;
 import ini_google.ad_hoc_building_sensor_devices.mad_hoc.adapters.SensorListAdapter;
 
-public class ListActivity extends AppCompatActivity {
+public class ListActivity extends AppCompatActivity implements SensorEventListener{
     private Activity activity = this;
     SensorListAdapter listAdapter;
     ExpandableListView expListView;
@@ -40,11 +46,15 @@ public class ListActivity extends AppCompatActivity {
     HashMap<String, HashMap<String, List<Parameter>>> record;
     private TextView AppName;
     private String targetSensor = null;
-    private Button deployButton, confirmButton;
+    private Button deployButton, calibrateButton,backButton;
     private Spinner spinner;
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
     private HashMap<String, String> lookupTable;
     private String configData,deviceConfig;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private int calibrationCount;
+    private float minValue,maxValue,avgValue;
 
 
     @Override
@@ -53,12 +63,14 @@ public class ListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list);
         AppName = (TextView) findViewById(R.id.appView);
         deployButton = (Button) findViewById(R.id.deployButton);
-        confirmButton = (Button) findViewById(R.id.confirmButton);
+        calibrateButton = (Button) findViewById(R.id.calibrateButton);
         spinner = (Spinner)findViewById(R.id.spinner);
         lookupTable = new HashMap<String, String>();
         record = new HashMap<String, HashMap<String, List<Parameter>>>();
         deviceConfig = "";
         lookupTableInit(lookupTable);
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensor = null;calibrationCount = 0;minValue =0 ;maxValue=0;avgValue=0;
 
         final Bundle bundle = getIntent().getExtras();
         configData = bundle.get("sensorConfig").toString();
@@ -94,16 +106,12 @@ public class ListActivity extends AppCompatActivity {
             }
         });
 
-        //dropdown.setSelection(((ArrayAdapter<String>)dropdown.getAdapter()).getPosition(items));
-
-        confirmButton.setOnClickListener(new View.OnClickListener() {
+        calibrateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                //use firebase code to update json
-                listAdapter.updateVal();
-                UpdateJson(configData);
-                Toast.makeText(activity, "Value Updated Successfully", Toast.LENGTH_LONG).show();
-                record.put(targetSensor, listDataChild);
+                startCalibration();
+
             }
         });
 
@@ -127,13 +135,69 @@ public class ListActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(activity, "device configuration is empty", Toast.LENGTH_LONG).show();
                 }
-                // intent.putExtra("instanceID",bundle.get("instanceID").toString());
-                // set data back to firebase
-                // startActivity(intent);
             }
         });
 
     }
+    public void startCalibration(){
+        if(targetSensor.equals("light")){
+            mSensor = mSensorManager.getDefaultSensor(5);
+            mSensorManager.registerListener((SensorEventListener) this,mSensor,100000);
+
+        }
+        mSensor = null;
+    }
+
+    public void onSensorChanged(SensorEvent event) {
+        if (targetSensor.equals("light")) {
+            float sensor_value = event.values[0];
+            if(calibrationCount == 0)
+            {
+                minValue = sensor_value;
+                maxValue = sensor_value;
+                avgValue = sensor_value;
+            }
+                calibrationCount++;
+            if(sensor_value<minValue) minValue = sensor_value;
+            if(sensor_value>maxValue) maxValue = sensor_value;
+            avgValue+=sensor_value;
+
+        }
+        if(calibrationCount == 149)
+        {
+            calibrationCount =0;
+            avgValue = avgValue/150;
+            mSensorManager.unregisterListener(this);
+            setCalibraation();
+        }
+    }
+    public void setCalibraation(){
+
+        if(targetSensor.equals("light")){
+            try {
+                JSONObject lightconfig = (new JSONObject(configData)).getJSONObject("light");
+                lightconfig.put("threshold_upper",Math.round(maxValue));
+                lightconfig.put("threshold_lower",Math.round(minValue));
+                configData = ((new JSONObject(configData)).put("light",lightconfig)).toString();
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        prepareListData(configData);
+        listAdapter.updateVal();
+        UpdateJson(configData);
+        Toast.makeText(activity, "Sensos Calibrated Successfully", Toast.LENGTH_LONG).show();
+        record.put(targetSensor, listDataChild);
+        listAdapter = new SensorListAdapter(activity, targetSensor, listDataChild);
+        expListView.setAdapter(listAdapter);
+
+    }
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
 
     private void getHeader(ArrayList<String> listItem, String configData) {
         try {
