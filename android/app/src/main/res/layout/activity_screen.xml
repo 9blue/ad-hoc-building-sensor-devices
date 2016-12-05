@@ -18,7 +18,7 @@
         android:weightSum="1">
 
         <TextView
-            android:text="TextView"
+            android:text=""
             android:layout_width="match_parent"
             android:layout_height="396dp"
             android:id="@+id/textView"

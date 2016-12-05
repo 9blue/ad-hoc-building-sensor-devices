@@ -188,9 +188,9 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         }
         if(this.type.equals("SCREEN"))
         {
-            Intent intent = new Intent(activity, QueueDisplayActivity.class);
+            Intent intent = new Intent(activity, ScreenActivity.class);
 
-            actuators.setValue(true);
+            actuators.child("display").child("display_color").setValue("grey");
             intent.putExtra("actuator_url","install_actuators".concat("/").concat(this.instanceID).concat("/").concat(parameter).concat("/").concat(device_id));
             intent.putExtra("instanceID", instanceID);
             startActivity(intent);
