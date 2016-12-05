@@ -68,7 +68,7 @@ public class MultiTrackerActivity extends AppCompatActivity{
         try {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_tracker);
-            backButton = (Button) findViewById(R.id.backButton);
+            backButton = (Button) findViewById(R.id.cancelButton);
             faceCount = (TextView) findViewById(R.id.faceCount);
             mPreview = (CameraSourcePreview) findViewById(R.id.preview);
             mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);

@@ -43,7 +43,7 @@ public class QueueDisplayActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_queue);
         expListView = (ExpandableListView) findViewById(R.id.queueList);
-        backButton = (Button) findViewById(R.id.backButton);
+        backButton = (Button) findViewById(R.id.cancelButton);
 
         final Bundle bundle = getIntent().getExtras();
         //configData =  bundle.get("sensorConfig").toString();
