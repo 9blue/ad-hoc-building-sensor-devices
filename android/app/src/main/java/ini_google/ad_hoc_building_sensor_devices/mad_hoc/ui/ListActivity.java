@@ -29,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -73,10 +74,9 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = null;calibrationCount = 0;minValue =0 ;maxValue=0;avgValue=0;
 
-        progressBar = (ProgressBar)findViewById(R.id.progressBar);
-
         final Bundle bundle = getIntent().getExtras();
         configData = bundle.get("sensorConfig").toString();
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         // get the listview, (ViewHolder)
         expListView = (ExpandableListView) findViewById(R.id.sensorList);
@@ -95,7 +95,9 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
                 targetSensor = adapterView.getSelectedItem().toString();
                 Toast.makeText(activity, adapterView.getSelectedItem().toString() + " is chosen", Toast.LENGTH_LONG).show();
                 // update listAdapter
-
+//                if(targetSensor.equals("camera") || targetSensor.equals("screen")) {
+//                    calibrateButton.setVisibility(View.GONE);
+//                }
                 if (!record.containsKey(targetSensor)) {
                     prepareListData(configData);
                 } else {
@@ -109,14 +111,13 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
             }
         });
         progressBar.setVisibility(View.INVISIBLE);
-
         calibrateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               //use firebase code to update json
+                //use firebase code to update json
                 progressBar.setVisibility(View.VISIBLE);
-
                 startCalibration();
+
             }
         });
 
@@ -130,12 +131,12 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
                 //Intent intent_tracker = new Intent(activity, MultiTrackerActivity.class);
 
                 if(!deviceConfig.isEmpty()){
-                   Intent intent = null;
-                   if(!targetSensor.isEmpty()) {
-                       intent = new Intent(activity, SensorActivity.class);
-                       intent.putExtra("sensorConfig", deviceConfig);
-                       intent.putExtra("instanceID", bundle.get("instanceID").toString());
-                   }
+                    Intent intent = null;
+                    if(!targetSensor.isEmpty()) {
+                        intent = new Intent(activity, SensorActivity.class);
+                        intent.putExtra("sensorConfig", deviceConfig);
+                        intent.putExtra("instanceID", bundle.get("instanceID").toString());
+                    }
                     startActivity(intent);
                 } else {
                     Toast.makeText(activity, "device configuration is empty", Toast.LENGTH_LONG).show();
@@ -150,8 +151,7 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
             mSensorManager.registerListener((SensorEventListener) this,mSensor,100000);
 
         }
-        else
-        {
+        else {
             setCalibraation();
         }
         mSensor = null;
@@ -166,16 +166,16 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
                 maxValue = sensor_value;
                 avgValue = sensor_value;
             }
-                calibrationCount++;
+            calibrationCount++;
             if(sensor_value<minValue) minValue = sensor_value;
             if(sensor_value>maxValue) maxValue = sensor_value;
             avgValue+=sensor_value;
 
         }
-        if(calibrationCount == 49)
+        if(calibrationCount == 149)
         {
             calibrationCount =0;
-            avgValue = avgValue/50;
+            avgValue = avgValue/150;
             mSensorManager.unregisterListener(this);
             setCalibraation();
         }
@@ -185,8 +185,8 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
         if(targetSensor.equals("light")){
             try {
                 JSONObject lightconfig = (new JSONObject(configData)).getJSONObject("light");
-                lightconfig.put("threshold_upper",Math.round(maxValue));
-                lightconfig.put("threshold_lower",Math.round(minValue));
+                lightconfig.put("threshold",Math.round(avgValue));
+                //lightconfig.put("threshold_lower",Math.round(minValue));
                 configData = ((new JSONObject(configData)).put("light",lightconfig)).toString();
 
             } catch (JSONException e) {
@@ -197,7 +197,6 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
         listAdapter.updateVal();
         UpdateJson(configData);
         progressBar.setVisibility(View.INVISIBLE);
-        //progressBar.setVisibility(View.GONE);
         Toast.makeText(activity, "Sensos Calibrated Successfully", Toast.LENGTH_LONG).show();
         record.put(targetSensor, listDataChild);
         listAdapter = new SensorListAdapter(activity, targetSensor, listDataChild);
@@ -230,42 +229,42 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
 
             //listDataHeader = new ArrayList<String>();
             //if (listDataChild == null) {
-                listDataChild = new HashMap<String, List<Parameter>>();
+            listDataChild = new HashMap<String, List<Parameter>>();
 
-                Iterator<?> keys = config.keys();
-                Parameter parameter = null;
-                List<Parameter> parameters = null;
+            Iterator<?> keys = config.keys();
+            Parameter parameter = null;
+            List<Parameter> parameters = null;
 
 //            while(keys.hasNext()) {
-                parameters = new ArrayList<Parameter>();
+            parameters = new ArrayList<Parameter>();
 //                String key = (String) keys.next();
-                String key = targetSensor;
-                JSONObject configSensor = (JSONObject) config.get(key);
-                parameter = null;
-                String type = configSensor.get("type").toString();
+            String key = targetSensor;
+            JSONObject configSensor = (JSONObject) config.get(key);
+            parameter = null;
+            String type = configSensor.get("type").toString();
 
-                //listDataHeader.add(key);
+            //listDataHeader.add(key);
 
-                if (key.equals("light") && configSensor.has("threshold_upper")) {
+               /* if (key.equals("light") && configSensor.has("threshold_upper")) {
                     //parameter = null;
                     parameter = new Parameter("threshold_upper", configSensor.get("threshold_upper").toString(), "Int");
                     parameters.add(parameter);
-                }
-                if ((key.equals("light") || key.equals("accelerometer")) && configSensor.has("threshold_lower")) {
-                    //parameter = null;
-                    parameter = new Parameter("threshold_lower", configSensor.get("threshold_lower").toString(), "Int");
-                    parameters.add(parameter);
-                }
-                if (key.equals("light") && configSensor.has("sampling_rate")) {
-                    //parameter = null;
-                    parameter = new Parameter("sampling_rate", configSensor.get("sampling_rate").toString(), "Int");
-                    parameters.add(parameter);
-                }
-                if (key.equals("camera")) {
-                    parameter = new Parameter("queue_number", "0", "Int");
-                    parameters.add(parameter);
-                }
-                listDataChild.put(targetSensor, parameters);
+                }*/
+            if ((key.equals("light") || key.equals("accelerometer")) && configSensor.has("threshold")) {
+                //parameter = null;
+                parameter = new Parameter("threshold", configSensor.get("threshold").toString(), "Int");
+                parameters.add(parameter);
+            }
+            if (key.equals("light") && configSensor.has("sampling_rate")) {
+                //parameter = null;
+                parameter = new Parameter("sampling_rate", configSensor.get("sampling_rate").toString(), "Int");
+                parameters.add(parameter);
+            }
+            if (key.equals("camera")) {
+                parameter = new Parameter("queue_number", "0", "Int");
+                parameters.add(parameter);
+            }
+            listDataChild.put(targetSensor, parameters);
 //            }
 //            }
 
@@ -290,20 +289,20 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
     private void UpdateJson(String configData) {
         try {
             JSONObject default_config = new JSONObject(configData);
-               List<Parameter> list = listDataChild.get(targetSensor);
-                JSONObject chosenConfig  = (JSONObject) default_config.get(targetSensor);
-               for(Parameter parameter:list) {
-                   String item = parameter.getItem();
-                   String val = parameter.getVal();
-                   //boolean fixed = parameter.getFixed();
-                   chosenConfig.put(item, val);
-               }
+            List<Parameter> list = listDataChild.get(targetSensor);
+            JSONObject chosenConfig  = (JSONObject) default_config.get(targetSensor);
+            for(Parameter parameter:list) {
+                String item = parameter.getItem();
+                String val = parameter.getVal();
+                //boolean fixed = parameter.getFixed();
+                chosenConfig.put(item, val);
+            }
 
             default_config = new JSONObject();
             default_config.put(targetSensor,chosenConfig);
             deviceConfig = default_config.toString();
 
-           } catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
@@ -344,7 +343,7 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
             }
         });
     }
-            // define new class for parameters
+    // define new class for parameters
     public class Parameter {
         String item;
         String val;
