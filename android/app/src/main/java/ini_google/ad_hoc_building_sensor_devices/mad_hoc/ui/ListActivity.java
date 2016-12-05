@@ -172,10 +172,10 @@ public class ListActivity extends AppCompatActivity implements SensorEventListen
             avgValue+=sensor_value;
 
         }
-        if(calibrationCount == 149)
+        if(calibrationCount == 99)
         {
             calibrationCount =0;
-            avgValue = avgValue/150;
+            avgValue = avgValue/100;
             mSensorManager.unregisterListener(this);
             setCalibraation();
         }
