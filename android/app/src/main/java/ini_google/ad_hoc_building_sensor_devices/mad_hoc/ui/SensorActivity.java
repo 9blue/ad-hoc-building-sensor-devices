@@ -134,8 +134,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 if(parameterType.equals("CAMERA")){
                     Intent intent = new Intent(activity, MultiTrackerActivity.class);
 
-                    sensors.child(this.instanceID).child(parameter).child(device_id).child(((JSONObject)this.deviceConfig.get(parameter)).get("queue_number").toString()).setValue(true);
-                    intent.putExtra("sensor_url","install_sensors".concat("/").concat(this.instanceID).concat("/").concat(parameter).concat("/").concat(device_id).concat("/").concat(((JSONObject)this.deviceConfig.get(parameter)).get("queue_number").toString()));
+                    sensors.child(this.instanceID).child(parameter).child(device_id).child("queue_number").setValue(((JSONObject)this.deviceConfig.get(parameter)).get("queue_number").toString());
+                    intent.putExtra("sensor_url","install_sensors".concat("/").concat(this.instanceID).concat("/").concat(parameter).concat("/").concat(device_id).concat("/"));
                     intent.putExtra("instanceID", instanceID);
                     startActivity(intent);
                 }
@@ -205,9 +205,11 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 }
             });
             actuators.setValue(false);
+            actuators.child("sound_message").setValue("");
             actuators.addValueEventListener(new ValueEventListener() {
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    String speakerText = dataSnapshot.getValue().toString();
+
+                    String speakerText = dataSnapshot.child("sound_message").getValue().toString();
                     // String speakString = this.desc;
                     speakMessage(speakerText);
                 }

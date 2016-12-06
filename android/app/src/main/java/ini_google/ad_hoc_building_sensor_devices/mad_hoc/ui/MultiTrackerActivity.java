@@ -100,6 +100,7 @@ public class MultiTrackerActivity extends AppCompatActivity{
                     faceCount.setText(String.valueOf(idList.size()));
                     sensors.child("value").setValue(idList.size());
                     sensors.child("last_modified").setValue(new Date().getTime());
+                    //sensors.child("queue_number")
                     //System.out.println("test");
                 }
             };
