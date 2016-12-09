@@ -8,7 +8,7 @@
         vm.text = 'Firebase rulez!';
 
         var dbRef = firebase.database().ref();
-        var appid = "-KY0VEKXfHvj_tbzTh4c";
+        var appid = "-KYG8Twgba4YZGzrnWix";
         vm.app_config = null;
         var instances = null;
         var appRef = dbRef.child('apps').child(appid);
