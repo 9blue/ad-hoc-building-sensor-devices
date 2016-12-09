@@ -8,7 +8,7 @@
             name: 'light',
             label: 'Light Sensor',
             disable: false,
-            tpl_url: '/template/sensors_tpl/light.html',
+            tpl_url: '/template/sensor_tpl/light.html',
             config: {
                 type: 'LIGHT',
                 desc: '',
@@ -20,7 +20,7 @@
             name: 'accelerometer',
             label: 'Accelerometer',
             disable: false,
-            tpl_url: '/template/sensors_tpl/accelerometer.html',
+            tpl_url: '/template/sensor_tpl/accelerometer.html',
             config: {
                 type: 'ACCELEROMETER',
                 desc: '',
@@ -30,7 +30,7 @@
             name: 'camera',
             label: 'Camera',
             disable: false,
-            tpl_url: '/template/sensors_tpl/camera.html',
+            tpl_url: '/template/sensor_tpl/camera.html',
             config: {
                 type: 'CAMERA',
                 desc: '',
@@ -42,7 +42,7 @@
             name: 'flash',
             label: 'Flash',
             disable: false,
-            tpl_url: '/template/acturator_tpl/flash.html',
+            tpl_url: '/template/actuator_tpl/flash.html',
             config: {
                 type: 'FLASH',
                 desc: ''
@@ -51,7 +51,7 @@
             name: 'screen',
             label: 'Screen',
             disable: false,
-            tpl_url: '/template/acturator_tpl/screen.html',
+            tpl_url: '/template/actuator_tpl/screen.html',
             config: {
                 type: 'SCREEN',
                 desc: '',
@@ -63,7 +63,7 @@
             name: 'speaker',
             label: 'Speaker',
             disable: false,
-            tpl_url: '/template/acturator_tpl/speaker.html',
+            tpl_url: '/template/actuator_tpl/speaker.html',
             config: {
                 type: 'SPEAKER',
                 desc: '',
