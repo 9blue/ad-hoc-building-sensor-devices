@@ -62,7 +62,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     private Button cancelButton;
     private SensorManager mSensorManager;
     private Sensor mSensor;
-    private int lowerThreshold,upperThreshold;
+    private int avgReading;
     private String instanceID ;
     private String type;
     private Sensor accelerometer;
@@ -134,8 +134,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 if(parameterType.equals("CAMERA")){
                     Intent intent = new Intent(activity, MultiTrackerActivity.class);
 
-                    sensors.child(this.instanceID).child(parameter).child(device_id).child(((JSONObject)this.deviceConfig.get(parameter)).get("queue_number").toString()).setValue(true);
-                    intent.putExtra("sensor_url","install_sensors".concat("/").concat(this.instanceID).concat("/").concat(parameter).concat("/").concat(device_id).concat("/").concat(((JSONObject)this.deviceConfig.get(parameter)).get("queue_number").toString()));
+                    sensors.child(this.instanceID).child(parameter).child(device_id).child("queue_number").setValue(((JSONObject)this.deviceConfig.get(parameter)).get("queue_number").toString());
+                    intent.putExtra("sensor_url","install_sensors".concat("/").concat(this.instanceID).concat("/").concat(parameter).concat("/").concat(device_id).concat("/"));
                     intent.putExtra("instanceID", instanceID);
                     startActivity(intent);
                 }
@@ -188,9 +188,9 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         }
         if(this.type.equals("SCREEN"))
         {
-            Intent intent = new Intent(activity, QueueDisplayActivity.class);
+            Intent intent = new Intent(activity, ScreenActivity.class);
 
-            actuators.setValue(true);
+            actuators.child("display").child("display_color").setValue("grey");
             intent.putExtra("actuator_url","install_actuators".concat("/").concat(this.instanceID).concat("/").concat(parameter).concat("/").concat(device_id));
             intent.putExtra("instanceID", instanceID);
             startActivity(intent);
@@ -205,9 +205,11 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 }
             });
             actuators.setValue(false);
+            actuators.child("sound_message").setValue("");
             actuators.addValueEventListener(new ValueEventListener() {
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    String speakerText = dataSnapshot.getValue().toString();
+
+                    String speakerText = dataSnapshot.child("sound_message").getValue().toString();
                     // String speakString = this.desc;
                     speakMessage(speakerText);
                 }
@@ -285,13 +287,13 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             JSONObject config = (JSONObject)(this.deviceConfig.get(parameter));
             if(parameterType.equals("LIGHT")) {
                 mSensor = mSensorManager.getDefaultSensor(5);
-                lowerThreshold = Integer.parseInt(config.get("threshold_lower").toString());
-                upperThreshold = Integer.parseInt(config.get("threshold_upper").toString());
+                avgReading = Integer.parseInt(config.get("threshold").toString());
+                //upperThreshold = Integer.parseInt(config.get("threshold_upper").toString());
 
             }
             if(parameterType.equals("ACCELEROMETER")){
                 mSensor = mSensorManager.getDefaultSensor(1);
-                accThreshold = Float.parseFloat(config.get("threshold_lower").toString());
+                accThreshold = Float.parseFloat(config.get("threshold").toString());
             }
             else{
                 sensorValue.setText("Sensor not supported");
@@ -358,7 +360,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             float sensor_value = event.values[0];
             sensorValue.setText(Float.toString(sensor_value));
 
-            if(sensor_value<upperThreshold && sensor_value>lowerThreshold)
+            if(sensor_value != 0)
             {
                 sensors.child("value").setValue(Float.toString(sensor_value));
                 sensors.child("last_modified").setValue(Long.toString(new Date().getTime()));

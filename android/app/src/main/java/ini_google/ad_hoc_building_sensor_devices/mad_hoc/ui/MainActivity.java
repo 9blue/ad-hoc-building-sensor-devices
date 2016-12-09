@@ -1,7 +1,9 @@
 package ini_google.ad_hoc_building_sensor_devices.mad_hoc.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.support.v7.app.AppCompatActivity;
@@ -153,7 +155,6 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(intent);
 
                             } catch (Exception e) {
-                                Toast.makeText(activity, "Configuration Error", Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
                             }
                         }
